@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShelterSeek - Find Your Perfect Stay</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+</head>
+<body>
+    <header>
+        <div class="top-navbar">
+            <div class="logo">
+                <h2>ShelterSeek</h2>
+            </div>
+            <div class="about"><a href="/about" >About</a></div>
+            <div class="traveler"><button id="user-button"><i class="fa fa-user" aria-hidden="true"></i></button></div>
+            <div id="user-menu" class="user-menu">
+                <button id="user-close-btn" class="user-close-btn">&times;</button>
+                <ul>
+                    <li><a href="/dashboard">dashboard</a></li>
+                    <li><a href="/loginweb" id="login-button">login</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero-section">
+            <div class="hero-content">
+                <!-- sliding photos -->
+                <div class="slide-2"></div>
+                <div class="text-container">
+                    <h1>Welcome to ShelterSeek</h1>
+                    <p>Find and list safe and affordable stays for travelers. Our platform ensures security and comfort for all users.</p>
+                    <a href="#listing-section" class="cta-button">Get Started</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="listing-section">
+            <div class="container">
+                <h2>Add a New Listing</h2>
+                <form id="listing-form">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" placeholder="Enter listing title" required>
+                      </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4" placeholder="Describe your property" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Price per Night (₹)</label>
+                            <input type="number" id="price" name="price" min="0" placeholder="Enter price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="location-name">Location Name</label>
+                            <input type="text" id="location" name="location" placeholder="Enter location name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="latitude">Latitude</label>
+                            <input type="text" id="latitude" name="latitude" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude</label>
+                            <input type="text" id="longitude" name="longitude" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxdays">Maximum Number of Days for Stay</label>
+                        <input type="number" id="maxdays" name="maxdays" min="1" placeholder="Enter maximum days" required>
+                      </div>
+                      
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="property-type">Property Type</label>
+                            <select id="propertyType" name="propertyType" required>
+                                <option value="pg">PG</option>
+                                <option value="house">House</option>
+                                <option value="resort">Resort</option>
+                                <option value="villa">Villa</option>
+                                <option value="duplex">Duplex</option>
+                                <option value="cottage">Cottage</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="hostel">Hostel</option>
+                                <option value="farmhouse">Farm House</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="capacity">Number of Travelers Accommodated</label>
+                            <input type="number" id="capacity" name="capacity" min="1" placeholder="Enter capacity" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="room-type">Room Type</label>
+                            <select id="roomType" name="roomType" required>
+                                <option value="any">Any</option>
+                                <option value="shared">Shared</option>
+                                <option value="full">Full</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bedrooms">Number of Bedrooms</label>
+                            <input type="number" id="bedrooms" name="bedrooms" min="1" placeholder="Enter bedrooms" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="beds">Number of Beds</label>
+                            <input type="number" id="beds" name="beds" min="1" placeholder="Enter beds" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="room-size">Room Size</label>
+                            <select id="roomSize" name="roomSize" required>
+                                <option value="small">Small</option>
+                                <option value="medium">Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Room Location</label>
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle" data-target="location-filter">
+                                Select Room Location
+                            </button>
+                            <div id="location-filter" class="filter-options">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="roomLocation" value="in-town"> In Town</label>
+                                    <label><input type="checkbox" name="roomLocation" value="outside-town"> Outside of Town</label>
+                                    <label><input type="checkbox" name="roomLocation" value="nearby-villages"> Nearby Villages</label>
+                                    <label><input type="checkbox" name="roomLocation" value="residential-area"> Residential Area</label>
+                                    <label><input type="checkbox" name="roomLocation" value="commercial-area"> Commercial Area</label>
+                                    <label><input type="checkbox" name="roomLocation" value="near-highway"> Near Highway</label>
+                                    <label><input type="checkbox" name="roomLocation" value="country-side"> Country Side</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Room Near Transport Station</label>
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle" data-target="transport-filter">
+                                Select Transport Station Distance
+                            </button>
+                            <div id="transport-filter" class="filter-options">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="transportDistance" value="2km"> Within 2km</label>
+                                    <label><input type="radio" name="transportDistance" value="5km"> Within 5km</label>
+                                    <label><input type="radio" name="transportDistance" value="10km"> Within 10km</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Host Gender</label>
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle" data-target="host-gender-filter">
+                                Select Host Gender
+                            </button>
+                            <div id="host-gender-filter" class="filter-options">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="hostGender" value="male"> Male</label>
+                                    <label><input type="radio" name="hostGender" value="female"> Female</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Food Providing Facility</label>
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle" data-target="food-filter">
+                                Select Food Facility
+                            </button>
+                            <div id="food-filter" class="filter-options">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="foodFacility" value="not-available"> Not Available</label>
+                                    <label><input type="radio" name="foodFacility" value="vegetarian"> Vegetarian</label>
+                                    <label><input type="radio" name="foodFacility" value="non-vegetarian"> Non-Vegetarian</label>
+                                    <label><input type="radio" name="foodFacility" value="both"> Both</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amenities</label>
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle" data-target="amenities-filter">
+                                Select Amenities
+                            </button>
+                            <div id="amenities-filter" class="filter-options">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="amenities" value="wifi"> WiFi</label>
+                                    <label><input type="checkbox" name="amenities" value="ac"> Air Conditioning</label>
+                                    <label><input type="checkbox" name="amenities" value="laundry"> Laundry</label>
+                                    <label><input type="checkbox" name="amenities" value="hot-water"> Hot Water</label>
+                                    <label><input type="checkbox" name="amenities" value="lift"> Lift</label>
+                                    <label><input type="checkbox" name="amenities" value="parking"> Free Car Parking</label>
+                                    <label><input type="checkbox" name="amenities" value="ev-charging"> EV Charging</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discount">Discount Percentage</label>
+                        <div class="discount-container">
+                            <input 
+                                type="range" 
+                                id="discount" 
+                                name="discount" 
+                                min="0" 
+                                max="100" 
+                                value="0"
+                                class="discount-range"
+                            >
+                            <span id="discount-value" class="discount-value">0%</span>
+                        </div>
+                    </div>
+                    <div class="interactive-map">
+                        <h2>Room Location</h2>
+                        <div id="map"></div>
+                    </div>
+
+                    <!-- Upload Photos & Videos Section -->
+<div class="form-group">
+    <label>Upload Photos & Videos</label>
+    <div class="upload-container">
+        <div class="upload-area">
+            <span class="home-icon">🏠</span>
+            <div class="upload-text">
+                <label for="media" class="upload-label">
+                    Upload files
+                    <input type="file" id="media" name="media" multiple accept="image/*,video/*" class="file-input">
+                </label>
+                <span>or drag and drop</span>
+            </div>
+            <p class="upload-hint">PNG, JPG, GIF, MP4 up to 50MB each</p>
+        </div>
+    </div>
+    <div id="media-preview" class="image-preview"></div>
+</div>
+
+
+<button type="submit" class="submit-button">Submit Listing</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ShelterSeek. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="/scripts/script.js"></script>
+</body>
+<footer>
+    <%-include('partials/footer')  %>
+</footer>
+</html>

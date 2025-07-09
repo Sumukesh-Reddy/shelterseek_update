@@ -1,0 +1,60 @@
+.wishlist-heading{
+    margin-top: 3vh;
+    margin-left: 4vw;
+    margin-bottom: 3vh;
+}
+#wishlist-span{
+    font-size: xx-large;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
+    font-weight: 400;
+    color: #d72d6e;
+}
+#wishlist-span-1{
+    margin-left: 0.2vw;
+}
+.likedrooms{
+    height: auto;
+    width: 80%;
+    margin-left: 10%;
+}
+
+.main-wish-home-block {
+    margin-top: 0; 
+    position: relative;
+    z-index: 0;
+    width: 95%;
+    height: auto;
+    margin-left: 1%;
+    padding: 1%;
+    display: grid;
+    grid-template-columns: 1fr; 
+    justify-content: center;
+    gap: 20px;
+}
+
+@media (min-width: 1100px) {
+    .main-wish-home-block {
+        grid-template-columns: 23% 23% 23% 23%; 
+    }
+    
+}
+
+@media (min-width: 935px) and (max-width: 1100px) {
+    .main-wish-home-block {
+        grid-template-columns: 1fr 1fr 1fr; 
+        gap: 20px;
+    }
+    
+}
+@media (min-width: 460px) and (max-width: 935px) {
+    .main-wish-home-block {
+        grid-template-columns:1fr 1fr; 
+        gap: 20px;
+    }
+    
+}
+@media (max-width: 460px){
+    .main-home-block {
+        grid-template-columns:1fr; 
+    }
+}

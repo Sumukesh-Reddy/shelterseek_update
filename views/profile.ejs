@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ShelterSeek</title>
+    <link rel="stylesheet" href="/styles/sumukesh_traveler.css">
+    <link rel="stylesheet" href="/styles/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <%- include('partials/header') %>
+
+    <div class="header-bg"></div>
+
+    <!-- Profile Section -->
+    <div class="profile-container">
+        <div class="profile-left">
+            <img src="/images/sai.png" alt="Profile Picture" class="profile-pic" id="profile-pic"><br>
+            <div class="upload-btn" id="change-profile-pic">Change Picture</div>
+        </div>
+        <div class="details-box">
+            <h2>Hi!&nbsp;&nbsp;</h2><h2 id="profile-name">Loading...</h2>
+            <p><strong>Email:</strong> <span id="profile-email">Loading...</span></p>
+            <p><strong>User Type:</strong> <span id="profile-account-type">Loading...</span></p>
+            
+            <div class="divider"></div>
+
+            <div class="password-change-section">
+                <h3>Change Password</h3>
+                <form id="change-password-form">
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <input type="password" id="confirm-password" required minlength="8">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+
+            <!-- Additional Functions -->
+            <div class="more-functions">
+                <button id="login-logout-text">Logout</button>
+                <button id="activity">View Activity</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+
+    <script src="/scripts/sumukesh_traveler.js"></script>
+    <script src="/scripts/profile.js"></script>
+</body>
+</html>

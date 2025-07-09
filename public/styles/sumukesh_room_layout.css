@@ -1,0 +1,329 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+.home-name{
+    width: 90vw;
+    margin-left: 5vw;
+    margin-bottom: 1vh;
+    display: flex;
+    align-items: center;
+}
+
+.share-button-div button{
+    font-size: larger;
+    background-color: #f4f4f4;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease-in;
+}
+
+.share-button-div button:hover{
+    color: #d72d6e;
+}
+
+.main-image {
+    margin-left: 5vw;
+    width: 90vw;
+    height: 60vh;
+    background-color: #ccc;
+    background-size: cover;
+    background-position: center;
+    border-radius: 2vw;
+}
+
+.main-image button {
+    position: absolute;
+    top: 48.4%;
+    height: 50vh;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0);
+    border: none;
+    padding: 2vh 2vw;
+    cursor: pointer;
+    border-radius: 2vw;
+    font-size: x-large;
+  }
+
+#prev-image {
+    color: #d72d6e;
+    left: 7vw;
+}
+#next-image {
+    color: #d72d6e;
+    right: 7vw;
+}
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 3vh 5vw;
+    gap: 2vw;
+}
+
+.left-side, .right-side {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+.layout-description, .verification , .room-information{
+    background: #fff;
+    padding: 3vh;
+    border-radius: 2vw;
+}
+
+.amenities-grid {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+
+.amenities-grid li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.amenity-name {
+    flex: 1;
+    text-align: left;
+    font-weight: bold;
+}
+
+.separator {
+    flex: 0.1;
+    text-align: center;
+}
+
+.amenities-grid span[id$="-verify"] {
+    flex: 1;
+    text-align: left;
+}
+
+
+.rent {
+    background: #fff;
+    padding: 3vh;
+    border-radius: 2vw;
+}
+
+.rent label {
+    display: block;
+    margin-top: 2vh;
+    font-weight: bold;
+}
+
+.rent input {
+    width: 100%;
+    font-size: large;
+    padding: 1.3vh;
+    margin-top: 1vh;
+    border: 1px solid #ccc;
+    border-radius: 1vw;
+    outline: none;
+}
+
+.rent p {
+    font-size: 2vh;
+    margin: 1vh 0;
+    font-weight: bold;
+}
+
+.rent .fa-star {
+    font-size: 2vh;
+}
+
+.rent input:hover{
+    
+    box-shadow: 1px 0px 5px rgba(0, 0, 0, 0.5);
+}
+/* Buttons */
+.rent button {
+    width: 48%;
+    padding: 2vh;
+    margin-top: 2vh;
+    border: none;
+    border-radius: 1vw;
+    cursor: pointer;
+}
+
+#rent-button {
+    font-size: large;
+    background-color: #d72d6e;
+    color: white;
+    transition: all 0.3s ease;
+}
+#save-button {
+    font-size: large;
+    background-color: #333;
+    color: white;
+}
+/* Host Section */
+.host-info {
+    width: 40vw;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 3vh;
+    border-radius: 2vw;
+}
+
+.host-image {
+    width: 8vw;
+    height: 8vw;
+    border-radius: 50%;
+    margin-right: 2vw;
+}
+
+#message{
+    padding: 2vh;
+    margin-top: 2vh;
+    border: none;
+    border-radius: 1vw;
+    cursor: pointer;
+    background-color: #d72d6e;
+    color: white;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+@media (min-width: 768px){
+
+    .share-button-div{
+        margin-left: 65vw;
+    }
+
+    #message{
+        width: 50%;
+        font-size: large;
+    }
+}
+@media (max-width: 768px) {
+
+    .share-button-div{
+        margin-left: 45vw;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+    .left-side, .right-side {
+        width: 100%;
+    }
+    #message{
+        width: 90%;
+        font-size: small;
+    }
+}
+
+/* Map Styling */
+#map {
+    width: 90vw;
+    height: 50vh;
+    margin-left: 5vw;
+    border-radius: 2vw;
+    margin-bottom: 4vh;
+}
+
+/* review */
+.review-item {
+    display: grid;
+    align-items: center;
+    gap: 2vw;
+    background: #fff;
+    padding: 2vh;
+    border-radius: 1vw;
+    width: 90%;
+    margin-bottom: 2vh;
+}
+
+@media (max-width: 700px) {
+    .review-item {
+        grid-template-columns: 60%;
+    }
+}
+
+@media (min-width: 700px) {
+    .review-item {
+        grid-template-columns:40% 40%;
+    }
+}
+
+.review-content {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+}
+
+.review-image {
+    width: 6vh;
+    height: 6vh;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.review-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.review-name {
+    color: #d72d6e;
+    margin: 0;
+}
+
+.review-rating {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.review-description {
+    font-size: 14px;
+    color: #333;
+}
+
+.stars {
+    font-size: 10px;
+    color: gold;
+}
+
+#avg-stars {
+    font-size: 15px;
+    color: gold;
+}
+.thumbnails {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.thumbnail.active {
+    border: 2px solid #d72d6e;
+}
+#rent-button, #save-button, #message {
+    transition: all 0.3s ease;
+}
+#rent-button:hover:not(:disabled) {
+    background-color: #b71c5a;
+}
+#save-button:hover {
+    background-color: #555;
+}
+#message:hover {
+    background-color: #b71c5a;
+}
+.share-button-div button:hover {
+    color: #d72d6e;
+}

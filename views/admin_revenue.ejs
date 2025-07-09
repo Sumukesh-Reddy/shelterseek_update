@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue - Admin Dashboard</title>
+    <link rel="stylesheet" href="/styles/admin_styles.css"> <!-- Reusing your existing navbar styles -->
+    <link rel="stylesheet" href="/styles/admin_revenue.css"> <!-- Specific styles for revenue page -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- <link rel="stylesheet" href="notifications.css"> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
+</head>
+<%-include('partials/admin_nav')  %>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <!-- <div class="logo">
+                <a href="index.html"><i class="fa-solid fa-user-tie" style="font-size: 1.6rem;"></i> Admin</a>
+            </div> -->
+          
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="revenue-content">
+        <div class="container">
+            <h1><i class="fas fa-chart-line"></i> Revenue Overview</h1>
+
+            <div class="filter-options">
+                <div class="filter-group">
+                    <label for="period">Period:</label>
+                    <div class="summary-tabs">
+                        <button class="tab active" data-tab="today">Today</button>
+                        <button class="tab" data-tab="weekly">Weekly</button>
+                        <button class="tab" data-tab="yearly">Yearly</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="roomType">Room Type:</label>
+                    <select id="roomType" class="dropdown-select">
+                        <option value="all">All Rooms</option>
+                        <option value="standard">Standard</option>
+                        <option value="deluxe">Deluxe</option>
+                        <option value="suite">Suite</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="location">Location:</label>
+                    <select id="location" class="dropdown-select">
+                        <optgroup label="All Locations">
+                            <option value="all">All Locations</option>
+                        </optgroup>
+                        <optgroup label="By City">
+                            <option value="city_New York">New York</option>
+                            <option value="city_Los Angeles">Los Angeles</option>
+                            <option value="city_Chicago">Chicago</option>
+                            <option value="city_Houston">Houston</option>
+                            <option value="city_Miami">Miami</option>
+                            <option value="city_Seattle">Seattle</option>
+                            <option value="city_Dallas">Dallas</option>
+                            <option value="city_Boston">Boston</option>
+                            <option value="city_San Francisco">San Francisco</option>
+                            <option value="city_Atlanta">Atlanta</option>
+                        </optgroup>
+                        <optgroup label="By State">
+                            <option value="state_New York">New York</option>
+                            <option value="state_California">California</option>
+                            <option value="state_Illinois">Illinois</option>
+                            <option value="state_Texas">Texas</option>
+                            <option value="state_Florida">Florida</option>
+                            <option value="state_Washington">Washington</option>
+                            <option value="state_Georgia">Georgia</option>
+                            <option value="state_Massachusetts">Massachusetts</option>
+                            <option value="state_Oregon">Oregon</option>
+                            <option value="state_Nevada">Nevada</option>
+                        </optgroup>
+                        <optgroup label="By Country">
+                            <option value="country_USA">United States</option>
+                            <option value="country_Canada">Canada</option>
+                            <option value="country_United Kingdom">United Kingdom</option>
+                            <option value="country_Australia">Australia</option>
+                            <option value="country_Germany">Germany</option>
+                            <option value="country_France">France</option>
+                            <option value="country_Italy">Italy</option>
+                            <option value="country_Spain">Spain</option>
+                            <option value="country_Japan">Japan</option>
+                            <option value="country_India">India</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Trend By:</label>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn active" data-trend="source">Booking Source</button>
+                        <button class="toggle-btn" data-trend="customer">Customer Type</button>
+                    </div>
+                </div>
+                <button class="detailed-report-btn"><i class="fas fa-file-alt"></i> View Detailed Report</button>
+            </div>
+
+            <section class="revenue-summary">
+                <div class="summary-card">
+                    <h3>Total Bookings</h3>
+                    <p class="amount" id="totalBookings">0</p>
+                    <p class="change" id="bookingChange"><i class="fas fa-arrow-up"></i> Increased by 0%</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Revenue</h3>
+                    <p class="amount" id="totalRevenue">$0</p>
+                    <p class="change" id="revenueChange"><i class="fas fa-arrow-up"></i> Increased by 0%</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Avg. Revenue per Room</h3>
+                    <p class="amount" id="avgRevenuePerRoom">$0</p>
+                    <p class="change" id="avgRevenueChange"><i class="fas fa-arrow-down"></i> Decreased by 0%</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Occupancy Rate</h3>
+                    <p class="amount" id="occupancyRate">0%</p>
+                    <p class="change" id="occupancyChange"><i class="fas fa-arrow-up"></i> Increased by 0%</p>
+                </div>
+                <div class="summary-card">
+                    <h3>RevPAR</h3>
+                    <p class="amount" id="revPAR">$0</p>
+                    <p class="change" id="revPARChange"><i class="fas fa-arrow-up"></i> Increased by 0%</p>
+                </div>
+            </section>
+
+            <section class="charts">
+                <div class="bar-chart">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="pie-chart">
+                    <canvas id="paymentPieChart"></canvas>
+                </div>
+            </section>
+
+            <section class="top-rooms">
+                <h2>Top Performing Rooms by Location</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Room Type</th>
+                            <th>Bookings</th>
+                            <th>Revenue</th>
+                            <th>Occupancy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topRoomsTable">
+                        <!-- Data will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <button class="export-btn"><i class="fas fa-download"></i> Export Data</button>
+        </div>
+    </main>
+
+    <script src="/scripts/admin_script.js"></script> <!-- Reusing your existing navbar script -->
+    <script src="/scripts/admin_revenue.js"></script> <!-- Specific script for revenue page -->
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92138159da618831',t:'MTc0MjEyMDI5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

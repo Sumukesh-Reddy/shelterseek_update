@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/admin_styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <!-- <div class="logo">
+                <a href="index.html"><i class="fa-solid fa-user-tie" style="font-size: 1.6rem;"></i> Admin</a>
+            </div> -->
+            <nav class="nav-links">
+                <ul>
+                    <li><a href="/admin_index"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <!-- <li><a href="#"><i class="fas fa-calendar-check"></i> Bookings</a></li> -->
+                    <li><a href="/admin_host-requests"><i class="fas fa-bed"></i> Host</a></li>
+                    <!-- <li><a href="#"><i class="fas fa-users"></i> Users</a></li> -->
+                    <li class="dropdown">
+                        <a href="/admin_revenue" class="dropdown-toggle"><i class="fas fa-chart-line"></i> Revenue <i class="fas fa-caret-down"></i></a>
+                    </li>
+                    <li><a href="/admin_notifications"><i class="fas fa-bell"></i> Users</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" id="profile-toggle"><i class="fas fa-user-circle"></i> Profile <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu" id="profile-dropdown">
+                            <li><a href="/admin_account"><i class="fas fa-user"></i> Account</a></li>
+                            <li><a href="/admin_notes"><i class="fa fa-sticky-note" aria-hidden="true"></i> Notes</a></li>
+                            <li><a href="/admin_logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    
+    <script src="/scripts/admin_script.js"></script>
+</body>
+</html>

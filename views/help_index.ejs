@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Page</title>
+    <link rel="stylesheet" href="/styles/helppage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <%-include('partials/header')  %>
+
+     <div class="help-navbar">
+        <div class="heading1">We are here to help you !</div>
+    <div class ="question-container">
+        <div class="question">
+            <span> How do I book a room ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p>Go to the "Rooms" section, select your dates, and choose a room type.Enter guest details  and payment information.Confirm your booking via email.</p>
+
+        </div>
+     </div>
+     <div class ="question-container">
+        <div class="question">
+            <span> Can I modify or cancel my booking ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p>Yes! Visit "My Bookings" in your account to edit dates or cancel.Cancellations are free up to [X hours/days] before check-in.Late cancellations may incur a fee (see Cancellation Policy).</p>
+        </div>
+     </div>
+     <div class ="question-container">
+        <div class="question">
+            <span> What payment methods do you accept ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p>Credit/debit cards (Visa, Mastercard, Amex).Digital wallets (Apple Pay, Google Pay).Note: Full payment is required at booking.</p>
+        </div>
+     </div>
+    <div class ="question-container">
+        <div class="question">
+            <span> I didn’t receive a confirmation email. What should I do ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p>Check your spam/junk folder.Ensure you entered the correct email address.Contact support at [email/phone] for assistance.</p>
+        </div>
+    </div>
+    <div class ="question-container">
+        <div class="question">
+            <span> How do I check room availability in real-time ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p></p>
+        </div>
+    </div>
+    <div class ="question-container">
+        <div class="question">
+            <span>Can I request special accommodations (e.g., wheelchair access) ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p>Yes! Mention requirements in the "Special Requests" box during booking.Contact us in advance for accessibility needs.Additional charges may apply for extra beds/amenities.</p>
+        </div>
+    </div>
+    <div class ="question-container">
+        <div class="question">
+            <span>What is your cancellation policy ?</span>
+            <div class="symbol">+</div>
+        </div>
+        <div class="answer">
+            <p>Free cancellation: Up to [48 hours] before check-in.Partial refund: [24–48 hours] before check-in.No refund: Cancellations within [24 hours].</p>
+        </div>
+    </div>
+        <div class="otherhelp">
+            <a href="/ex">
+            <button class="helpbutton">More help</button>
+            </a>
+        </div>
+        </div>
+     </div>
+     <script src="/scripts/helppage.js"></script>
+</body>
+<footer>
+    <%-include('partials/footer')  %>
+</footer>
+</html>

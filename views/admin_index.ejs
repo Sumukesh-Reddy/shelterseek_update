@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Hotel Booking Admin Dashboard</title>
+    <link rel="stylesheet" href="/styles/admin_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/admin_nav') %>
+    <main>
+        <!-- Dashboard Overview -->
+        <section class="dashboard-overview">
+            <h2>Dashboard Overview</h2>
+            <div class="overview-cards">
+                <div class="overview-card">
+                    <h3>Total Booking</h3>
+                    <p><%= totalBookings.toLocaleString() %> <span class="trend <%= trendDirection %>"><%= trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '' %> <%= trendPercentage %>%</span></p>
+                    <p>This Month: <%= thisMonthBookings.toLocaleString() %></p>
+                    <p>This Week: <%= thisWeekBookings.toLocaleString() %></p>
+                </div>
+                <div class="overview-card">
+                    <h3>Rooms Available</h3>
+                    <p>312</p> <!--total atributes -->
+                    <p>Booked (M): 913</p> <!--monthly booked -->
+                    <p>Booked (W): 125</p>  <!--weekly booked sun to sat -->
+                   
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- New Customer and Recent Activities -->
+        <div class="customer-activity-container">
+            <section class="new-customer">
+                <h2>New Customer</h2>
+                <ul id="new-customers-list">
+                    <% newCustomers.forEach(customer => { %>
+                        <li>
+                            <span class="initials"><%= customer.initials %></span>
+                            <%= customer.name %> <br> <%= customer.email %>
+                        </li>
+                    <% }); %>
+                </ul>
+                <a href="#">View All</a>
+            </section>
+
+            <section class="recent-activities">
+                <h2>Recent Activities</h2>
+                <ul id="recent-activities-list">
+                    <% recentActivities.forEach(activity => { %>
+                        <li>
+                            <span class="initials"><%= activity.initials %></span>
+                            <%= activity.name %> <%= activity.action %>. <br>
+                            <span class="time-ago" data-timestamp="<%= activity.updatedAt.toISOString() %>">
+                                <%= new Date(activity.updatedAt).toLocaleTimeString() %>
+                            </span>
+                        </li>
+                    <% }); %>
+                </ul>
+            </section>
+        </div>
+
+       
+        <!-- Revenue Overview -->
+        <section class="revenue-overview">
+            <h2>Revenue Overview</h2>
+  <div class="revenue-cards">
+    <div class="card">
+      <h3>Total Revenue</h3>
+      <p>₹<%= totalRevenue %></p>
+    </div>
+    <div class="card">
+      <h3>This Month</h3>
+      <p>₹<%= thisMonthRevenue %></p>
+    </div>
+    <div class="card">
+      <h3>This Week</h3>
+      <p>₹<%= thisWeekRevenue %></p>
+    </div>
+  </div>
+        </section>
+
+        <!-- Booking Management -->
+        <section class="booking-management">
+            <h2>Booking Management</h2>
+            <div class="booking-filters">
+                <input type="text" id="search-bookings" placeholder="Search by guest name or booking ID">
+            </div>
+            <table id="bookings-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Guest Name</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                        <th>Amount</th>
+                        <th>User Mail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bookings.forEach(booking => { %>
+                        <tr>
+                            <td><%= booking.id %></td>
+                            <td><%= booking.guestName %></td>
+                            <td><%= booking.checkIn %></td>
+                            <td><%= booking.checkOut %></td>
+                            <td>₹<%= booking.amount %></td>
+                            <td><%= booking.email %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Room Availability -->
+        <section class="room-availability">
+            <h2>Room Availability</h2>
+            <div class="availability-filters">
+                <input type="date" id="availability-date" value="2023-10-15">
+                <select id="room-type-filter">
+                    <option value="all">All</option>
+                    <option value="standard">Standard</option>
+                    <option value="deluxe">Deluxe</option>
+                    <option value="suite">Suite</option>
+                </select>
+            </div>
+            <div id="availability-list"></div>
+        </section>
+
+        <!-- Guest Management -->
+        <section class="guest-management">
+            <h2>Guest Management</h2>
+            <div class="guest-filters">
+                <input type="text" id="search-guests" placeholder="Search by guest name">
+            </div>
+            <table id="guests-table">
+                <thead>
+                    <tr>
+                        <th>Guest ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="/scripts/admin_script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

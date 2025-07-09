@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Dashboard - ShelterSeek</title>
+    <link rel="stylesheet" href="/styles/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>ShelterSeek</h1>
+                <p>Host Dashboard</p>
+            </div>
+            <nav class="nav-links">
+                <a href="/hostProfile" class="nav-link ">
+                    <i class="fa fa-user"></i>
+                    Profile
+                </a>
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    Overview
+                </a>
+                <a href="#bookings" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    Bookings
+                </a>
+                <a href="#earnings" class="nav-link">
+                    <i class="fas fa-dollar-sign"></i>
+                    Earnings
+                </a>
+                <a href="#" class="nav-link logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Overview</h2>
+
+            <!-- Listings Section -->
+            <div class="listings-section">
+                <h3>Your Listings</h3>
+                <div id="listings-container" class="listings-container">
+                    <% if (typeof listings !== 'undefined' && listings.length > 0) { %>
+                        <% listings.forEach(function(listing) { %>
+                            <div class="listing-card" data-id="<%= listing._id %>">
+                                <h4><%= listing.title %></h4>
+                                <p><strong>Description:</strong> <%= listing.description %></p>
+                                <p><strong>Price:</strong> ₹<%= listing.price %></p>
+                                <p><strong>Location:</strong> <%= listing.location %></p>
+                                <p><strong>Coordinates:</strong> 
+                                    (<%= listing.coordinates && listing.coordinates.lat ? listing.coordinates.lat : '' %>, 
+                                    <%= listing.coordinates && listing.coordinates.lng ? listing.coordinates.lng : '' %>)
+                                </p>
+                                <p><strong>Property Type:</strong> <%= listing.propertyType %></p>
+                                <p><strong>Capacity:</strong> <%= listing.capacity %></p>
+                                <p><strong>Room Type:</strong> <%= listing.roomType %></p>
+                                <p><strong>Bedrooms:</strong> <%= listing.bedrooms %></p>
+                                <p><strong>Beds:</strong> <%= listing.beds %></p>
+                                <p><strong>Room Size:</strong> <%= listing.roomSize %></p>
+                                <p><strong>Room Location:</strong> <%= listing.roomLocation %></p>
+                                <p><strong>Transport Distance:</strong> <%= listing.transportDistance %></p>
+                                <p><strong>Host Gender:</strong> <%= listing.hostGender %></p>
+                                <p><strong>Food Facility:</strong> <%= listing.foodFacility %></p>
+                                <p><strong>Amenities:</strong> <%= listing.amenities && listing.amenities.length ? listing.amenities.join(', ') : '' %></p>
+                                <p><strong>Discount:</strong> <%= listing.discount %></p>
+                                <p><strong>Likes:</strong> <%= listing.likes %></p>
+                                <p><strong>Status:</strong> <%= listing.status %></p>
+                                <p><strong>Booking Available:</strong> <%= listing.booking ? 'Yes' : 'No' %></p>
+                                <p><strong>Reviews:</strong> <%= listing.reviews && listing.reviews.length ? listing.reviews.join(', ') : '' %></p>
+                                <p><strong>Created At:</strong> <%= listing.createdAt ? listing.createdAt.toLocaleString() : '' %></p>
+                                <% if (listing.images && listing.images.length > 0) { %>
+                                    <div>
+                                        <strong>Images:</strong>
+                                        <% listing.images.forEach(function(imgId) { %>
+                                            <img src="/api/images/<%= imgId %>" alt="Listing Image" style="width: 100px; height: auto; margin-right: 5px;" />
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                                <button class="update-listing-btn" data-id="<%= listing._id %>">Update</button>
+                                <button class="delete-listing-btn" data-id="<%= listing._id %>">Delete</button>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No listings found. Create your first listing!</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Bookings Section (Hidden by Default) -->
+            <div class="bookings-section hidden">
+                <h3>Bookings per Month</h3>
+                <div class="monthly-bookings">
+                    <ul id="monthly-bookings-list">
+                        <!-- Monthly bookings will be dynamically inserted here -->
+                    </ul>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bookingsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Earnings Section (Hidden by Default) -->
+            <div class="earnings-section hidden">
+                <h3>Earnings per Month</h3>
+                <div class="monthly-earnings">
+                    <ul id="monthly-earnings-list">
+                        <!-- Monthly earnings will be dynamically inserted here -->
+                    </ul>
+                </div>
+                <div class="chart-container">
+                    <canvas id="earningsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load dashboard.js -->
+    <script type="module" src="/scripts/dashboard.js"></script>
+</body>
+</html>

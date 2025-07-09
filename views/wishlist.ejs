@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wishlist</title>
+    <link rel="stylesheet" href="/styles/sumukesh_traveler.css">
+    <link rel="stylesheet" href="/styles/sumukesh_room_layout.css">
+    <link rel="stylesheet" href="/styles/wishlist.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+     <!-- navbar -->
+     <%-include('partials/header')  %>
+  <!-- end of nav bar -->
+    <div class="wishlist-heading">
+        <span id="wishlist-span">Your wishlist</span><br>
+        <span id="wishlist-span-1">We are here to show your favorite rooms</span>
+    </div>     
+    <hr style="opacity: 0.3;">
+
+    <div class="main-wish-home-block" id="likedrooms"></div>
+     <!-- help -->
+     <div class="help"><a href="/help_index"><i class="fa fa-commenting-o" aria-hidden="true" id="help-icon"></i><br><span >&nbsp;&nbsp;&nbsp;Help</span></a></div>
+   
+
+     
+    <script type="module" src="/scripts/sumukesh_traveler.js"></script>
+    <script type="module" src="/scripts/sorted_houses.js"></script>
+     <script type="module" src="/scripts/wishlist.js"></script>
+    <script type="module" src="/scripts/sumukesh_layout.js"></script>
+</body>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<footer>
+    <%-include('partials/footer')  %>
+</footer>
+</html>

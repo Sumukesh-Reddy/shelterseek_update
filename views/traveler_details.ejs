@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Traveler Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fc;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin-top: 40px;
+      color: #34495e;
+      border-bottom: 2px solid #3498db;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+
+    .info {
+      margin-top: 10px;
+      line-height: 1.8;
+    }
+
+    .booking-card {
+      border-left: 5px solid #3498db;
+      background: #f4f6fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .booking-card:hover {
+      transform: scale(1.01);
+    }
+
+    .booking-card p {
+      margin: 5px 0;
+    }
+
+    .no-bookings {
+      margin-top: 20px;
+      font-style: italic;
+      color: #777;
+    }
+
+    .back-button {
+      margin-top: 40px;
+      display: inline-block;
+      background: #3498db;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .back-button:hover {
+      background: #2c80b4;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1, h2 {
+        font-size: 1.4em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><%= traveler.name %> (<%= traveler.email %>)</h1>
+    <div class="info">
+      <p><strong>Account Type:</strong> <%= traveler.accountType %></p>
+      <p><strong>Joined:</strong> <%= new Date(traveler.createdAt).toLocaleDateString() %></p>
+    </div>
+
+    <h2>Booking History</h2>
+
+    <% if (bookings && bookings.length > 0) { %>
+      <% bookings.forEach(booking => { %>
+        <div class="booking-card">
+          <p><strong>Room ID:</strong> <%= booking.roomId %></p>
+          <p><strong>Check-In:</strong> <%= new Date(booking.checkIn).toLocaleDateString() %></p>
+          <p><strong>Check-Out:</strong> <%= new Date(booking.checkOut).toLocaleDateString() %></p>
+          <p><strong>Amount Paid:</strong> ₹<%= booking.amount %></p>
+          <p><strong>Payment Date:</strong> <%= new Date(booking.paymentDate).toLocaleDateString() %></p>
+          <p><strong>Host:</strong> <%= booking.hostMail %></p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p class="no-bookings">No bookings found for this traveler.</p>
+    <% } %>
+
+    <a href="/admin_notifications" class="back-button">← Back to Users</a>
+  </div>
+</body>
+</html>

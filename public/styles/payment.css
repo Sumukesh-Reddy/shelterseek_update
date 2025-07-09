@@ -1,0 +1,166 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f9;
+    color: #333;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Main container */
+.container {
+    max-width: 600px;
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 20px auto;
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Booking details section */
+.booking-details {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.booking-details p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.booking-details strong {
+    color: #2c3e50;
+}
+
+/* Payment form */
+#payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #3498db;
+}
+
+/* Complete payment button */
+#complete-payment {
+    background: #3498db;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+#complete-payment:hover:not(:disabled) {
+    background: #2980b9;
+}
+
+#complete-payment:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Error message styling */
+.global-error {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.error-content {
+    background: #04f17a;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.error-content i {
+    font-size: 18px;
+}
+
+.error-content span {
+    font-size: 14px;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .booking-details p {
+        font-size: 14px;
+    }
+
+    #complete-payment {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .global-error {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .error-content {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}

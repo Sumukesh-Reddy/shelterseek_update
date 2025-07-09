@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | ShelterSeek</title>
+    <link rel="stylesheet" href="/styles/saistyle.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta http-equiv="Content-Security-Policy" content="img-src 'self' data: https://*.tile.openstreetmap.org https://cdn.jsdelivr.net https://res.cloudinary.com https://unpkg.com https://images.unsplash.com;">
+</head>
+<body>
+    <div class="container">
+        <div class="hero-section">
+            <img src="/images/photo1.png" alt="Hero Image" class="hero-image">
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <h1 class="hero-title" id="heroTitle">Welcome to ShelterSeek</h1>
+                    <p class="hero-subtitle">Your gateway to exceptional stays. Whether you're a traveler seeking comfort or a host ready to welcome guests, we've got you covered.</p>
+                    <div class="features-list">
+                        <div class="feature-item"><i class="fas fa-check-circle"></i> Verified Properties</div>
+                        <div class="feature-item"><i class="fas fa-lock"></i> Secure Booking</div>
+                        <div class="feature-item"><i class="fas fa-headset"></i> 24/7 Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div id="loginPage" class="login-page">
+                <h2 class="page-title">Sign in to ShelterSeek</h2>
+                
+                <div id="loginOptions" class="login-options">
+                    <button class="login-button" data-type="traveller">
+                        <div class="login-button-content">
+                            <span class="login-button-icon"><i class="fas fa-suitcase"></i></span>
+                            <div>
+                                <div class="login-button-text">Traveler Account</div>
+                                <div class="login-button-description">Book stays and manage your trips</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    <button class="login-button" data-type="host">
+                        <div class="login-button-content">
+                            <span class="login-button-icon"><i class="fas fa-home"></i></span>
+                            <div>
+                                <div class="login-button-text">Host Account</div>
+                                <div class="login-button-description">Manage your property and bookings</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    <button class="login-button" data-type="admin">
+                        <div class="login-button-content">
+                            <span class="login-button-icon"><i class="fas fa-user-shield"></i></span>
+                            <div>
+                                <div class="login-button-text">Admin Portal</div>
+                                <div class="login-button-description">System management and oversight</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div id="loginForm" class="form-container">
+                    <form>
+                        <div class="form-group">
+                            <label for="loginEmail" class="form-label">Email address</label>
+                            <input type="email" id="loginEmail" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" id="loginPassword" class="form-input" required>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" id="loginBackButton" class="back-button">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="submit" class="submit-button">Sign in</button>
+                        </div>
+                    </form>
+
+                    <div class="account-section">
+                        <span class="account-text">New to ShelterSeek?</span>
+                        <button id="goToRegister" class="account-button">
+                            <i class="fas fa-user-plus"></i> Create an account
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="registerPage" class="register-page hidden">
+                <h2 class="page-title">Create Your Account</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName" class="form-label">Full Name</label>
+                        <input type="text" id="registerName" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerEmail" class="form-label">Email address</label>
+                        <input type="email" id="registerEmail" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerProfilePhoto" class="form-label">Profile Photo</label>
+                        <input type="file" id="registerProfilePhoto" class="form-input" accept="image/*">
+                        <img id="profilePhotoPreview" class="profile-photo-preview" alt="Profile Photo Preview">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPassword" class="form-label">Password</label>
+                        <input type="password" id="registerPassword" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">I want to</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="traveller" name="accountType" value="traveller" required>
+                                <label for="traveller"><i class="fas fa-suitcase"></i> Book Stays</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="host" name="accountType" value="host" required>
+                                <label for="host"><i class="fas fa-home"></i> Host Guests</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-button">Create Account</button>
+                    </div>
+                </form>
+
+                <div class="account-section">
+                    <span class="account-text">Already have an account?</span>
+                    <button id="goToLogin" class="account-button">
+                        <i class="fas fa-sign-in-alt"></i> Sign in
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/saiscript.js"></script>
+</body>
+</html>

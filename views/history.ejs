@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking History</title>
+    <link rel="stylesheet" href="/styles/sumukesh_traveler.css">
+    <style>
+    /* Main container for booking history */
+#bookings-container {
+    margin-top: 0;
+    position: relative;
+    z-index: 0;
+    width: 95%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1%;
+    display: grid;
+    grid-template-columns: 1fr; /* Default to 1 column */
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Responsive grid layout for larger screens */
+@media (min-width: 1100px) {
+    #bookings-container {
+        grid-template-columns: repeat(4, 23%); /* 4 columns */
+    }
+}
+
+/* Responsive grid layout for medium-large screens */
+@media (min-width: 935px) and (max-width: 1100px) {
+    #bookings-container {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+        gap: 20px;
+    }
+}
+
+/* Responsive grid layout for medium screens */
+@media (min-width: 460px) and (max-width: 935px) {
+    #bookings-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+        gap: 20px;
+    }
+}
+
+/* Responsive grid layout for small screens */
+@media (max-width: 460px) {
+    #bookings-container {
+        grid-template-columns: 1fr; /* 1 column */
+    }
+}
+
+/* Individual booking card styling */
+.booking {
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+.booking:hover {
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    transform: scale(1.03);
+}
+
+.home-photos-block {
+    position: relative;
+    width: 100%;
+    height: 25vh; /* Adjust height as needed */
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.home-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+}
+
+.home-content {
+    margin-left: 2%;
+    justify-content: center;
+}
+
+.home-content h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.home-content p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #555;
+}
+
+.price {
+    color: #d72d6e;
+    font-weight: bold;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #888;
+}
+
+button {
+    display: block;
+    margin: 20px auto;
+    height: 40px;
+    width: auto;
+    padding: 0 20px;
+    background-color: #d72d6e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #b3245a;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    </style>
+</head>
+<body>
+    <h1 style="color: #d72d6e; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Booking History</h1>
+    <div id="bookings-container"></div>
+    <button id="history-home">Home</button>
+
+    <script type="module" src="/scripts/history.js"></script>
+</body>
+<footer>
+    <%-include('partials/footer')  %>
+</footer>
+</html>

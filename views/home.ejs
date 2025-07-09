@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShelterSeek</title>
+    <link rel="stylesheet" href="/styles/sumukesh_traveler.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+</head>
+</head>
+<body>
+<%-include('partials/header')  %>
+    <!-- navbar -->
+  <!-- sliding photos and content -->
+    <div class="slide-1">
+        <div class="slide-2"></div>
+        <div class="slide-3"><b><h2>Welcome to ShelterSeek!</h2></b>Discover your perfect travel destination with just a click.Explore, plan, and create unforgettable memories. Whether you're seeking adventure, relaxation, or cultural experiences, we've got something for every traveler. Join us on a journey that brings your dream getaway to life!</div>
+    </div>
+
+    <br>
+
+    <hr style="opacity: 0.3;">
+
+    <div class="filter"><button id="filter-button"><i class="fa fa-sliders" ></i><span >filter</span></button></div>
+   <div class="filter-menu">
+        <div class="filter-close"><button id="filter-close-button">&times;</button></div>
+        <!-- date in -->
+        <div class="filter-group">
+            <label for="check-in"><b>Check-in Date:</b></label>
+            <div class="date-in">
+                <input type="date" id="check-in" name="check-in-date">
+            </div>
+        </div>
+
+        <div class="filter-group-1">
+            <label><b>Days:</b></label>
+            <div class="counter">
+                <button id="sub-days">-</button>
+                <span id="days">1</span>
+                <button id="add-days">+</button>
+            </div>
+        </div>
+
+        <!-- shared or full room -->
+        <div class="filter-group">
+            <label><b>Room Type:</b></label>
+            <div class="radio-group" id="room-type">
+                <label class="radio-option"><input type="radio" name="room" value="any" checked> Any</label>
+                <label class="radio-option"><input type="radio" name="room" value="shared"> Shared</label>
+                <label class="radio-option"><input type="radio" name="room" value="full"> Full</label>
+            </div>
+        </div>
+        
+
+        <div class="filter-group-1">
+            <label><b>Bedrooms:</b></label>
+            <div class="counter">
+                <button id="sub-bedroom">-</button>
+                <span id="bedrooms">1</span>
+                <button id="add-bedroom">+</button>
+            </div>
+        </div>
+        
+        <div class="filter-group-1">
+            <label><b>Beds:</b></label>
+            <div class="counter">
+                <button id="sub-beds">-</button>
+                <span id="beds">1</span>
+                <button id="add-beds">+</button>
+            </div>
+        </div>
+        
+        <div class="filter-group-1">
+            <label><b>Adults:</b></label>
+            <div class="counter">
+                <button id="sub-adults">-</button>
+                <span id="adults">0</span>
+                <button id="add-adults">+</button>
+            </div>
+        </div>
+        
+        <div class="filter-group-1">
+            <label><b>Children:</b></label>
+            <div class="counter">
+                <button id="sub-childrens">-</button>
+                <span id="childrens">0</span>
+                <button id="add-childrens">+</button>
+            </div>
+        </div>
+
+        <!-- price -->
+        <div class="filter-group">
+            <div class="double-slider-box">
+                <h3 class="range-title">Price Range</h3>
+                
+                <div class="range-slider">
+                    <div class="range-selected"></div>
+                </div>
+            
+                <div class="range-input">
+                    <input type="range" class="min-input" min="500" max="10000" value="500">
+                    <input type="range" class="max-input" min="500" max="10000" value="9500">
+                </div>
+            
+                <div class="range-price">
+                    <label for="min-price">Min:&nbsp;&#8377;</label>
+                    <input class="min-price" style="background-color: none;border:none;padding:none;font-size:medium">
+                    
+                    <label for="max-price">Max:&nbsp;&#8377;</label>
+                    <input class="max-price" style="background-color: none;border:none;padding:none;font-size:medium">
+                </div>
+            </div>
+            
+        </div>
+
+<!-- room type -->
+        <div class="filter-group">
+            <label><b>Type of House:</b></label>
+            <div class="room-options">
+                <div class="room-box" data-value="pg">PG</div>
+                <div class="room-box" data-value="house">House</div>
+                <div class="room-box" data-value="resort">Resort</div>
+                <div class="room-box" data-value="villa">Villa</div>
+                <div class="room-box" data-value="duplex">Duplex</div>
+                <div class="room-box" data-value="cottage">Cottage</div>
+                <div class="room-box" data-value="apartment">Apartment</div>
+                <div class="room-box" data-value="hostels">Hostels</div>
+                <div class="room-box" data-value="farm">Farm House</div>
+            </div>
+            <input type="hidden" id="selected-room-types" name="room" value="">
+        </div>
+
+        <!-- room location -->
+
+
+        <div class="filter-group">
+            <label><b>Room Location:</b></label>
+            <div class="multi-select" id="room-location">
+              <div class="select-box" data-value="in-town">In Town</div>
+              <div class="select-box" data-value="outside-town">Outside of Town</div>
+              <div class="select-box" data-value="nearby-villages">Nearby Villages</div>
+              <div class="select-box" data-value="residential-area">Residential Area</div>
+              <div class="select-box" data-value="commercial-area">Commercial Area</div>
+              <div class="select-box" data-value="near-highway">Near Highway</div>
+              <div class="select-box" data-value="countryside">Countryside</div>
+            </div>
+            <input type="hidden" id="selected-room-location" name="room-location" value="">
+          </div>
+
+
+        <!-- Room Near Transport Station -->
+        <div class="filter-group">
+            <label><b>Room Near a Transport Station:</b></label>
+            <div class="radio-group" id="transport-station">
+                <label class="radio-option"><input type="radio" name="room-distance" value="any" checked> Any</label>
+                <label class="radio-option"><input type="radio" name="room-distance" value="2km"> 2 km</label>
+                <label class="radio-option"><input type="radio" name="room-distance" value="5km"> 5 km</label>
+                <label class="radio-option"><input type="radio" name="room-distance" value="10km"> 10 km</label>
+            </div>
+        </div>
+
+        <!-- Room Size -->
+        <div class="filter-group">
+            <label><b>Room Size:</b></label>
+            <div class="radio-group" id="room-size">
+                <label class="radio-option"><input type="radio" name="room-size" value="any" checked> Any</label>
+                <label class="radio-option"><input type="radio" name="room-size" value="small"> Small</label>
+                <label class="radio-option"><input type="radio" name="room-size" value="medium"> Medium</label>
+                <label class="radio-option"><input type="radio" name="room-size" value="large"> Large</label>
+            </div>
+        </div>
+
+        <!-- Amenities -->
+        <div class="filter-group">
+            <label><b>Amenities:</b></label>
+            <div class="multi-select" id="amenities">
+                <div class="select-box" data-value="wifi">WiFi</div>
+                <div class="select-box" data-value="ac">AC</div>
+                <div class="select-box" data-value="laundry">Laundry</div>
+                <div class="select-box" data-value="hotwater">Hot Water</div>
+                <div class="select-box" data-value="lift">Lift</div>
+                <div class="select-box" data-value="car-parking">Free Car Parking</div>
+                <div class="select-box" data-value="ev-charging">EV Charging</div>
+            </div>
+            <input type="hidden" id="selected-amenities" name="amenities" value="">
+        </div>
+
+        <!-- Host Gender -->
+        <div class="filter-group">
+            <label><b>Host Gender:</b></label>
+            <div class="radio-group" id="host-gender">
+                <label class="radio-option"><input type="radio" name="host" value="any" checked> Any</label>
+                <label class="radio-option"><input type="radio" name="host" value="male"> Male</label>
+                <label class="radio-option"><input type="radio" name="host" value="female"> Female</label>
+                <label class="radio-option"><input type="radio" name="host" value="family"> Family-friendly</label>
+            </div>
+        </div>
+
+        <!-- Food Preferences -->
+        <div class="filter-group">
+            <label><b>Food Preferences:</b></label>
+            <div class="multi-select" id="food-preferences">
+                <div class="select-box" data-value="vegetarian">Vegetarian</div>
+                <div class="select-box" data-value="non-vegetarian">Non-Vegetarian</div>
+            </div>
+            <input type="hidden" id="selected-food" name="food" value="">
+        </div>
+        
+
+        <div class="filter-search">
+            <button id="filter-search-button">search</button>
+        </div>
+    </div>
+    <!-- wishlist -->
+
+    <!-- home blocks -->
+         
+        <!-- <div class="home-block">
+            <div class="home-photos-block">
+                <button id="home-like"><i class="fa fa-heart" aria-hidden="true"></i></button>
+                <button id="img-move-left">&lt;</button>
+                <button id="img-move-right">&gt;</button>
+                <div class="home-image"></div> 
+            </div>
+            <hr style="opacity: 0.3;">
+            <div class="home-content">
+                <h3>Home Title</h3>
+                <p>Location: New York</p>
+                <p class="price">₹14,399 <span class="old-price">₹47,900</span></p>
+                <p style="color: green;font-weight: bold;">67% off</p>
+                <p>Description: Beautiful home with a great view and spacious rooms.</p>
+            </div>
+        </div> -->
+
+        <div class="main-home-block" id="homes-container"></div>
+
+        <!-- Featured Destinations Section -->
+<div class="featured-destinations">
+    <h2>Featured Destinations</h2>
+    <div class="destination-grid">
+        <div class="destination-card">
+            <img src="/images/photo4.jpg" alt="Destination 1">
+            <h3>Chennai</h3>
+            <p>Explore the bustling streets of Chennai, known for its rich culture, historic temples, and vibrant beaches.</p>
+            <a href="#" class="btn">Learn More</a>
+        </div>
+        <div class="destination-card">
+            <img src="/images/photo3.jpg" alt="Destination 2">
+            <h3>Goa</h3>
+            <p>Discover the romantic charm of Goa with its pristine beaches, lively nightlife, and Portuguese heritage.</p>
+            <a href="#" class="btn">Learn More</a>
+        </div>
+        <div class="destination-card">
+            <img src="/images/photo1.jpg" alt="Destination 3">
+            <h3>Tirupati</h3>
+            <p>xperience the spiritual aura of Tirupati, home to the famous Venkateswara Temple and scenic hills.</p>
+            <a href="#" class="btn">Learn More</a>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonials Section -->
+<div class="testimonials">
+    <h2>What Our Users Say</h2>
+    <div class="testimonial-grid">
+        <div class="testimonial-card">
+            <p>"ShelterSeek helped me find the perfect place for my vacation. Highly recommended!"</p>
+            <h3>- ACK Levi</h3>
+        </div>
+        <div class="testimonial-card">
+            <p>"Amazing service and great accommodations. Will definitely use again!"</p>
+            <h3>- Luffy</h3>
+        </div>
+        <div class="testimonial-card">
+            <p>"The best travel website I've ever used. Everything was perfect!"</p>
+            <h3>- Naruto</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Blog Section -->
+<div class="blog">
+    <h2>Latest Blog Posts</h2>
+    <div class="blog-grid">
+        <div class="blog-card">
+            <img src="/images/photo3.jpg" alt="Blog 1">
+            <h3>Top 10 Travel Tips</h3>
+            <p>Discover the best tips for a stress-free travel experience.</p>
+            <a href="#" class="btn">Read More</a>
+        </div>
+        <div class="blog-card">
+            <img src="/images/photo1.jpg" alt="Blog 2">
+            <h3>Best Destinations for 2025</h3>
+            <p>Find out the top destinations to visit in 2025.</p>
+            <a href="#" class="btn">Read More</a>
+        </div>
+        <div class="blog-card">
+            <img src="/images/photo2.jpg" alt="Blog 3">
+            <h3>How to Travel on a Budget</h3>
+            <p>Learn how to travel without breaking the bank.</p>
+            <a href="#" class="btn">Read More</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="top-10-travel-tips-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <img src="/images/photo3.jpg" alt="Blog 1">
+        </div>
+        <div class="modal-body">
+            <h2>Top 10 Travel Tips</h2>
+            <p>1. Plan ahead and book flights and accommodations early to save money.</p>
+                <p>2. Pack light and only bring essentials to avoid extra baggage fees.</p>
+                <p>3. Research local customs and etiquette to respect the culture.</p>
+                <p>4. Stay hydrated and carry a reusable water bottle.</p>
+                <p>5. Use travel apps for navigation, translation, and recommendations.</p>
+                <p>6. Keep important documents and valuables secure.</p>
+                <p>7. Learn a few basic phrases in the local language.</p>
+                <p>8. Be flexible and open to unexpected experiences.</p>
+                <p>9. Take photos but also enjoy the moment without your phone.</p>
+                <p>10. Travel insurance is a must for peace of mind.</p>
+        </div>
+    </div>
+</div>
+
+<div id="best-destinations-for-2025-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <img src="/images/photo1.jpg" alt="Blog 2">
+        </div>
+        <div class="modal-body">
+            <h2>Best Destinations for 2025</h2>
+            <p>1. Paris, France - The City of Light continues to enchant visitors.</p>
+                <p>2. Tokyo, Japan - A blend of tradition and modernity.</p>
+                <p>3. New York City, USA - The city that never sleeps.</p>
+                <p>4. Bali, Indonesia - Tropical paradise with stunning beaches.</p>
+                <p>5. Cape Town, South Africa - Breathtaking landscapes and wildlife.</p>
+                <p>6. Rome, Italy - Ancient history and delicious cuisine.</p>
+                <p>7. Sydney, Australia - Iconic landmarks and vibrant culture.</p>
+                <p>8. Dubai, UAE - Futuristic architecture and luxury experiences.</p>
+                <p>9. Kyoto, Japan - Serene temples and traditional tea houses.</p>
+                <p>10. Reykjavik, Iceland - Northern lights and geothermal wonders.</p>
+        </div>
+    </div>
+</div>
+
+<div id="how-to-travel-on-a-budget-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <img src="/images/photo2.jpg" alt="Blog 3">
+        </div>
+        <div class="modal-body">
+            <h2>How to Travel on a Budget</h2>
+            <p>1. Use budget airlines and book flights during off-peak seasons.</p>
+                <p>2. Stay in hostels, guesthouses, or use platforms like Airbnb.</p>
+                <p>3. Cook your own meals instead of eating out every day.</p>
+                <p>4. Use public transportation instead of taxis.</p>
+                <p>5. Look for free or discounted attractions and activities.</p>
+                <p>6. Travel with a group to split costs.</p>
+                <p>7. Use travel reward points and loyalty programs.</p>
+                <p>8. Avoid tourist traps and explore local neighborhoods.</p>
+                <p>9. Pack light to avoid extra baggage fees.</p>
+                <p>10. Plan and budget your trip in advance.</p>
+        </div>
+    </div>
+</div>
+
+<!-- New York Modal -->
+<div id="chennai-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <img src="/images/photo4.jpg" alt="Chennai">
+        </div>
+        <div class="modal-body">
+            <h2>Chennai</h2>
+            <p>Chennai, the capital of Tamil Nadu, is a vibrant city known for its rich cultural heritage, historic temples, and beautiful beaches. It is a hub of art, music, and dance, offering a perfect blend of tradition and modernity.</p>
+            <h3>Highlights</h3>
+            <ul>
+                <li>Rich cultural heritage</li>
+                <li>Historic temples and architecture</li>
+                <li>Pristine beaches</li>
+                <li>Delicious South Indian cuisine</li>
+            </ul>
+            <h3>Must-Visit Attractions</h3>
+            <ul>
+                <li>Marina Beach</li>
+                <li>Kapaleeshwarar Temple</li>
+                <li>Fort St. George</li>
+                <li>Government Museum</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Goa Modal -->
+<div id="goa-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <img src="/images/photo3.jpg" alt="Goa">
+        </div>
+        <div class="modal-body">
+            <h2>Goa</h2>
+            <p>Goa, India's smallest state, is famous for its stunning beaches, vibrant nightlife, and Portuguese-influenced architecture. It is a perfect destination for relaxation, adventure, and cultural exploration.</p>
+            <h3>Highlights</h3>
+            <ul>
+                <li>Pristine beaches</li>
+                <li>Vibrant nightlife</li>
+                <li>Portuguese heritage</li>
+                <li>Water sports and adventure activities</li>
+            </ul>
+            <h3>Must-Visit Attractions</h3>
+            <ul>
+                <li>Calangute Beach</li>
+                <li>Basilica of Bom Jesus</li>
+                <li>Fort Aguada</li>
+                <li>Anjuna Flea Market</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Tokyo Modal -->
+<div id="tirupati-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <img src="/images/photo1.jpg" alt="Tirupati">
+        </div>
+        <div class="modal-body">
+            <h2>Tirupati</h2>
+            <p>Tirupati, located in the state of Andhra Pradesh, is one of the most important pilgrimage destinations in India. It is home to the sacred Venkateswara Temple and offers a serene and spiritual experience.</p>
+            <h3>Highlights</h3>
+            <ul>
+                <li>Spiritual significance</li>
+                <li>Scenic hills and natural beauty</li>
+                <li>Rich cultural heritage</li>
+                <li>Peaceful and serene environment</li>
+            </ul>
+            <h3>Must-Visit Attractions</h3>
+            <ul>
+                <li>Sri Venkateswara Temple</li>
+                <li>Silathoranam (Natural Arch)</li>
+                <li>Akasa Ganga</li>
+                <li>Kapila Theertham</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Interactive Map -->
+<div class="interactive-map">
+    <h2>Explore Our Destinations</h2>
+    <div id="map"></div>
+</div>
+    
+
+    <!-- help -->
+<div class="help"><a href="/help_index" ><i class="fa fa-commenting-o" aria-hidden="true" id="help-icon"></i><br><span >&nbsp;&nbsp;&nbsp;Help</span></a></div>
+
+    <!-- footer -->
+    <script type="module" src="/scripts/sumukesh_traveler.js"></script>
+    <script type="module" src="/scripts/sorted_houses.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+</body>
+<footer>
+    <%-include('partials/footer')  %>
+</footer>
+</html>

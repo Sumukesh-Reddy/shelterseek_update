@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notifications</title>
+    <link rel="stylesheet" href="/styles/admin_notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+    <div class="container">
+        <button id="back_admin">back</button>
+        <h1>User Management</h1>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-buttons">
+            <a href="/admin_notifications?tab=host" class="<%= activeTab === 'host' ? 'active' : '' %>">
+                Hosts
+            </a>
+            <a href="/admin_notifications?tab=traveller" class="<%= activeTab === 'traveller' ? 'active' : '' %>">
+                Travellers
+            </a>
+        </div>
+
+        <div class="pill-search-container">
+            <input type="text" id="searchInput" class="pill-input" placeholder="Where to go!" />
+            <button id="searchToggle" class="pill-button">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+          
+          
+          
+
+        <!-- Users Table -->
+        <% if (users && users.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Account Type</th>
+                        <th>Joined Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr data-user-id="<%= user._id %>">
+                            <td><%= user.name || 'N/A' %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.accountType %></td>
+                            <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                            <td>
+                                <button class="btn-view">View</button>
+                                <button class="btn-delete">Delete</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="no-data">
+                No <%= activeTab === 'host' ? 'hosts' : 'travellers' %> found
+                <% if (error) { %>
+                    <small>Error: <%= error %></small>
+                <% } else { %>
+                    <small>Try again later or check your database connection</small>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+
+    <script src="/scripts/admin_notifications.js"></script>
+</body>
+</html>

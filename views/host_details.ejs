@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Host Details</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+    }
+
+    .host-info {
+      background-color: #ffffff;
+      border-left: 6px solid #4CAF50;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .host-info h1 {
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    .room-card {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      border-left: 5px solid #007bff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+
+    .room-card:hover {
+      transform: scale(1.01);
+    }
+
+    .room-card h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+
+    .room-card p {
+      margin: 6px 0;
+      font-size: 15px;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: #e3f2fd;
+      color: #007bff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin: 3px 5px 3px 0;
+      font-size: 13px;
+    }
+
+    .section-title {
+      color: #34495e;
+      font-size: 24px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #007bff;
+      display: inline-block;
+      padding-bottom: 4px;
+    }
+
+    .no-rooms {
+      font-style: italic;
+      color: #888;
+      margin-top: 20px;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .back-button:hover {
+      background: #0056b3;
+    }
+
+    /* Image Gallery Styles */
+    .image-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .gallery-image {
+      width: 200px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .gallery-image:hover {
+      transform: scale(1.05);
+    }
+
+    .image-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .image-warning {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <% if (user) { %>
+      <div class="host-info">
+        <h1><%= user.name %> (<%= user.email %>)</h1>
+        <% if (user.phone) { %>
+          <p><strong>Phone:</strong> <%= user.phone %></p>
+        <% } %>
+        <% if (user.address) { %>
+          <p><strong>Address:</strong> <%= user.address %></p>
+        <% } %>
+      </div>
+    <% } %>
+
+    <h2 class="section-title">Room Listings</h2>
+
+    <% if (rooms.length > 0) { %>
+      <% rooms.forEach(room => { %>
+        <div class="room-card">
+          <h3><%= room.title %></h3>
+          <p><strong>Description:</strong> <%= room.description %></p>
+          <p><strong>Price:</strong> ₹<%= room.price %></p>
+          <p><strong>Location:</strong> <%= room.location %></p>
+          <p><strong>Property Type:</strong> <%= room.propertyType %></p>
+          <p><strong>Room Type:</strong> <%= room.roomType %></p>
+          <p><strong>Room Size:</strong> <%= room.roomSize %></p>
+          <p><strong>Room Location:</strong> <%= room.roomLocation %></p>
+          <p><strong>Capacity:</strong> <%= room.capacity %></p>
+          <p><strong>Bedrooms:</strong> <%= room.bedrooms %></p>
+          <p><strong>Beds:</strong> <%= room.beds %></p>
+          <p><strong>Transport Distance:</strong> <%= room.transportDistance %></p>
+          <p><strong>Host Gender:</strong> <%= room.hostGender %></p>
+          <p><strong>Food Facility:</strong> <%= room.foodFacility %></p>
+          <p><strong>Status:</strong> <%= room.status %></p>
+          <p><strong>Booking:</strong> <%= room.booking ? "Available" : "Not Available" %></p>
+          <p><strong>Discount:</strong> <%= typeof room.discount !== 'undefined' ? room.discount + '%' : 'None' %></p>
+          <p><strong>Likes:</strong> <%= room.likes %></p>
+
+          <% if (room.amenities && room.amenities.length > 0) { %>
+            <p><strong>Amenities:</strong>
+              <% room.amenities.forEach(a => { %>
+                <span class="tag"><%= a %></span>
+              <% }); %>
+            </p>
+          <% } %>
+
+          <% if (room.imageUrls && room.imageUrls.length > 0) { %>
+            <div class="image-gallery">
+              <% room.imageUrls.forEach(url => { %>
+                <img 
+                  class="gallery-image" 
+                  src="<%= url %>" 
+                  alt="Room photo" 
+                  onerror="this.src='/public/images/broken-image.jpg'"
+                >
+              <% }); %>
+            </div>
+          <% } else { %>
+            <p><em>No images available</em></p>
+          <% } %>
+
+          <% if (room.missingImageCount > 0) { %>
+            <div class="image-warning">
+              <strong>⚠ Missing <%= room.missingImageCount %> image<%= room.missingImageCount > 1 ? 's' : '' %>:</strong>
+              <ul>
+                <% room.missingImageIds.forEach(id => { %>
+                  <li><code><%= id %></code></li>
+                <% }); %>
+              </ul>
+            </div>
+          <% } %>
+
+          <% if (room.reviews && room.reviews.length > 0) { %>
+            <p><strong>Reviews:</strong> <%= room.reviews.length %></p>
+          <% } else { %>
+            <p><strong>Reviews:</strong> No reviews</p>
+          <% } %>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p class="no-rooms">No properties listed by this host.</p>
+    <% } %>
+
+    <a href="/admin_notifications" class="back-button">← Back to Users</a>
+  </div>
+</body>
+</html>

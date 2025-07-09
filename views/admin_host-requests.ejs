@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Host Requests</title>
+    <link rel="stylesheet" href="/styles/admin_host-requests.css">
+    
+</head>
+<body>
+    <div class="host-requests-container">
+        <h1>Host Requests</h1>
+        <input type="text" id="search-bar" placeholder="Search by host name...">
+        <div class="host-requests-list"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Selected Host</h2>
+        <p><strong>Title:</strong> <span id="sidebar-host-name">N/A</span></p>
+        <p><strong>Location:</strong> <span id="sidebar-host-location">N/A</span></p>
+        <p><strong>Price:</strong> <span id="sidebar-host-price">N/A</span></p>
+        <p><strong>Status:</strong> <span id="sidebar-host-status">N/A</span></p>
+    </div>
+
+    <!-- Modal -->
+    <div id="host-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h2 id="modal-host-name">Host Details</h2>
+            <p><strong>Name:</strong> <span id="modal-host-name-text"></span></p>
+            <p><strong>Email:</strong> <span id="modal-host-email"></span></p>
+            <p><strong>Title:</strong> <span id="modal-host-title"></span></p>
+            <p><strong>Description:</strong> <span id="modal-host-description"></span></p>
+            <p><strong>Price:</strong> <span id="modal-host-price"></span></p>
+            <p><strong>Location:</strong> <span id="modal-host-location"></span></p>
+            <p><strong>Property Type:</strong> <span id="modal-host-property-type"></span></p>
+            <p><strong>Capacity:</strong> <span id="modal-host-capacity"></span></p>
+            <p><strong>Room Type:</strong> <span id="modal-host-room-type"></span></p>
+            <p><strong>Bedrooms:</strong> <span id="modal-host-bedrooms"></span></p>
+            <p><strong>Beds:</strong> <span id="modal-host-beds"></span></p>
+            <p><strong>Room Size:</strong> <span id="modal-host-room-size"></span></p>
+            <p><strong>Room Location:</strong> <span id="modal-host-room-location"></span></p>
+            <p><strong>Transport Distance:</strong> <span id="modal-host-transport-distance"></span></p>
+            <p><strong>Host Gender:</strong> <span id="modal-host-gender"></span></p>
+            <p><strong>Food Facility:</strong> <span id="modal-host-food-facility"></span></p>
+            <p><strong>Amenities:</strong> <span id="modal-host-amenities"></span></p>
+            <p><strong>Discount:</strong> <span id="modal-host-discount"></span></p>
+            <p><strong>Max Days:</strong> <span id="modal-host-maxdays"></span></p>
+            <p><strong>Created At:</strong> <span id="modal-host-created-at"></span></p>
+            <div id="modal-media"></div>
+            <div class="modal-actions">
+                <select id="modal-host-status">
+                    <option value="pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <button class="accept">Accept</button>
+                <button class="reject">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pass hostRequests to JavaScript safely -->
+    <script>
+        // Use a try-catch to handle any initialization errors
+        try {
+            // Directly embed the JSON data from EJS, ensuring proper escaping
+            window.hostRequests = <%- JSON.stringify(hostRequests || []) %>;
+
+            // Log for debugging
+            console.log('Initial host requests data loaded:', window.hostRequests);
+
+            // If no data, fetch from API
+            if (!window.hostRequests || window.hostRequests.length === 0) {
+                console.log('No initial data, fetching from API...');
+                fetch('/api/host-requests')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
+                        return response.json();
+                    })
+                    .then(data => {
+                        window.hostRequests = data.data || [];
+                        console.log('Fetched host requests:', window.hostRequests);
+                        // Trigger UI update after fetch
+                        if (typeof populateHostRequests === 'function') {
+                            populateHostRequests();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching host requests:', error);
+                        window.hostRequests = [];
+                        // Show error to user
+                        const container = document.querySelector('.host-requests-container');
+                        if (container) {
+                            const errorElement = document.createElement('div');
+                            errorElement.className = 'error-message';
+                            errorElement.textContent = 'Error loading host requests from API. Please refresh the page.';
+                            container.appendChild(errorElement);
+                        }
+                    });
+            }
+        } catch (error) {
+            console.error('Error initializing hostRequests:', error);
+            window.hostRequests = [];
+
+            // Show error to user
+            const container = document.querySelector('.host-requests-container');
+            if (container) {
+                const errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                errorElement.textContent = 'Error loading host requests. Please refresh the page.';
+                container.appendChild(errorElement);
+            }
+        }
+    </script>
+
+    <script src="/scripts/admin_host-requests.js"></script>
+</body>
+</html>
