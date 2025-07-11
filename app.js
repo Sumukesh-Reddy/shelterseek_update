@@ -53,8 +53,6 @@ if (!process.env.MONGODB_URI || !process.env.HOST_ADMIN_URI || !process.env.ADMI
 
 // loginDataBase connection
 mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   retryWrites: true,
   w: 'majority',
   maxPoolSize: 10,
@@ -74,8 +72,6 @@ const LoginData = mongoose.model('LoginData', loginDataSchema, 'LoginData');
 
 // Host_Admin connection
 const hostAdminConnection = mongoose.createConnection(HOST_ADMIN_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   retryWrites: true,
   w: 'majority',
   maxPoolSize: 10,
@@ -95,8 +91,6 @@ hostAdminConnection.once('open', () => {
 
 // Admin_Traveler connection
 const travelerConnection = mongoose.createConnection(ADMIN_TRAVELER_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   retryWrites: true,
   w: 'majority',
   maxPoolSize: 10,
@@ -136,10 +130,13 @@ const roomSchema = new mongoose.Schema({
 }, { collection: 'RoomDataTraveler' });
 const Room = travelerConnection.model('Room', roomSchema);
 
+// No unique index creation needed since _id is inherently unique
+Room.init().then(() => {
+  console.log('No additional unique index created for _id as it is inherently unique');
+});
+
 // Payment connection
 const paymentConnection = mongoose.createConnection(PAYMENT_DB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   retryWrites: true,
   w: 'majority',
   maxPoolSize: 10,
@@ -183,7 +180,8 @@ app.use(
         "https://res.cloudinary.com",
         "https://unpkg.com",
         `http://localhost:${port}`,
-        `http://localhost:${port}/public/uploads/`
+        `http://localhost:${port}/public/uploads/`,
+        `http://localhost:${port}/images/`
       ],
       connectSrc: ["'self'"],
       scriptSrcAttr: ["'none'"]
@@ -216,7 +214,31 @@ app.use(async (req, res, next) => {
     const RoomData = hostAdminConnection.collection('RoomData');
     const allRooms = await RoomData.find({}, { projection: { likes: 0, booking: 0, reviews: 0, contact: 0, hostId: 0 } }).limit(10).toArray();
     const pendingRooms = await RoomData.find({ status: 'pending' }, { projection: { likes: 0, booking: 0, reviews: 0, contact: 0, hostId: 0 } }).limit(5).toArray();
-    req.roomData = { allRooms, pendingRooms };
+    
+    // Validate and clean image URLs
+    const validateImageUrl = async (image) => {
+      if (!image) return null;
+      if (ObjectId.isValid(image.$oid || image)) {
+        const imageId = image.$oid || image;
+        const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+        return exists.length > 0 ? `/api/images/${imageId}` : null;
+      } else if (image.startsWith('public/uploads/')) {
+        const filePath = path.join(__dirname, image);
+        return fs.existsSync(filePath) ? `/public/${image}` : null;
+      }
+      return null;
+    };
+
+    const cleanedAllRooms = await Promise.all(allRooms.map(async room => ({
+      ...room,
+      images: (await Promise.all((room.images || []).map(validateImageUrl))).filter(url => url) || ['/images/placeholder.png']
+    })));
+    const cleanedPendingRooms = await Promise.all(pendingRooms.map(async room => ({
+      ...room,
+      images: (await Promise.all((room.images || []).map(validateImageUrl))).filter(url => url) || ['/images/placeholder.png']
+    })));
+
+    req.roomData = { allRooms: cleanedAllRooms, pendingRooms: cleanedPendingRooms };
     next();
   } catch (error) {
     console.error('RoomData Middleware Error:', error.message);
@@ -302,45 +324,43 @@ app.get('/admin_notifications', async (req, res) => {
 app.get('/admin_revenue', renderPage('admin_revenue'));
 app.get('/admin_account', renderPage('admin_account'));
 app.get('/admin_host-requests', async (req, res) => {
-  const emails = [...new Set(req.roomData.allRooms.map(room => room.email).filter(email => email))];
-  const imageUrlsByEmail = {};
-  for (const email of emails) {
-    try {
-      const response = await fetch(`http://localhost:${port}/api/host-requests/images?email=${encodeURIComponent(email)}`, { headers: { 'Content-Type': 'application/json' } });
-      const data = response.ok && response.headers.get('content-type')?.includes('application/json') ? await response.json() : { images: [] };
-      imageUrlsByEmail[email] = data.images || [];
-    } catch (error) {
-      console.error(`Error fetching images for email: ${email}`, error.message);
-      imageUrlsByEmail[email] = [];
-    }
-  }
-  const hostRequests = req.roomData.allRooms.map(room => ({
-    _id: room._id?.toString(), name: room.name || 'Unknown', email: room.email || 'No email', title: room.title || 'No title', description: room.description || 'No description',
-    price: room.price?.toString() || 'N/A', location: room.locationName || room.location || 'N/A', coordinates: JSON.stringify(room.coordinates) || 'N/A', propertyType: room.propertyType || 'N/A',
-    capacity: room.capacity?.toString() || 'N/A', roomType: room.roomType || 'N/A', bedrooms: room.bedrooms?.toString() || 'N/A', beds: room.beds?.toString() || 'N/A',
-    roomSize: room.roomSize || 'N/A', roomLocation: room.roomLocation || 'N/A', transportDistance: room.transportDistance || 'N/A', hostGender: room.hostGender || 'N/A',
-    foodFacility: room.foodFacility || 'N/A', amenities: room.amenities?.join(', ') || 'N/A', discount: room.discount?.toString() || 'N/A', maxdays: (room.maxdays || room.maxDays)?.toString() || 'N/A',
-    images: room.images || [], imageUrls: imageUrlsByEmail[room.email] || [], createdAt: room.createdAt || 'N/A', status: room.status || 'pending'
+  const rooms = req.roomData.allRooms.map(room => ({
+    _id: room._id?.toString(),
+    name: room.name || 'Unknown',
+    email: room.email || 'No email',
+    title: room.title || 'No title',
+    description: room.description || 'No description',
+    price: room.price?.toString() || 'N/A',
+    location: room.locationName || room.location || 'N/A',
+    coordinates: JSON.stringify(room.coordinates) || 'N/A',
+    propertyType: room.propertyType || 'N/A',
+    capacity: room.capacity?.toString() || 'N/A',
+    roomType: room.roomType || 'N/A',
+    bedrooms: room.bedrooms?.toString() || 'N/A',
+    beds: room.beds?.toString() || 'N/A',
+    roomSize: room.roomSize || 'N/A',
+    roomLocation: room.roomLocation || 'N/A',
+    transportDistance: room.transportDistance || 'N/A',
+    hostGender: room.hostGender || 'N/A',
+    foodFacility: room.foodFacility || 'N/A',
+    amenities: room.amenities?.join(', ') || 'N/A',
+    discount: room.discount?.toString() || 'N/A',
+    maxdays: (room.maxdays || room.maxDays)?.toString() || 'N/A',
+    images: room.images || ['/images/placeholder.png'],
+    createdAt: room.createdAt || 'N/A',
+    status: room.status || 'pending'
   }));
-  res.render('admin_host-requests', { hostRequests: hostRequests || [] });
+  res.render('admin_host-requests', { hostRequests: rooms || [] });
 });
 
 // API Routes
-
 app.post('/api/images', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ status: 'fail', message: 'No image uploaded' });
     }
-
-    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-      bucketName: 'images'
-    });
-
-    const uploadStream = bucket.openUploadStream(req.file.originalname, {
-      contentType: req.file.mimetype
-    });
-
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'images' });
+    const uploadStream = bucket.openUploadStream(req.file.originalname, { contentType: req.file.mimetype });
     fs.createReadStream(req.file.path).pipe(uploadStream)
       .on('error', (error) => {
         console.error('Error streaming image to GridFS:', error.message);
@@ -348,20 +368,11 @@ app.post('/api/images', upload.single('image'), async (req, res) => {
       })
       .on('finish', () => {
         fs.unlinkSync(req.file.path);
-        res.json({
-          status: 'success',
-          data: {
-            id: uploadStream.id.toString(),
-            filename: req.file.originalname
-          }
-        });
+        res.json({ status: 'success', data: { id: uploadStream.id.toString(), filename: req.file.originalname } });
       });
   } catch (error) {
     console.error('Error uploading image:', error.message);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to upload image'
-    });
+    res.status(500).json({ status: 'error', message: 'Failed to upload image' });
   }
 });
 
@@ -399,28 +410,16 @@ app.post('/api/change-password', async (req, res) => {
 app.patch('/api/update-profile-photo', async (req, res) => {
   try {
     const { email, accountType, profilePhoto } = req.body;
-
     if (!email || !accountType || !profilePhoto) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Email, accountType, and profilePhoto are required",
-      });
+      return res.status(400).json({ status: "fail", message: "Email, accountType, and profilePhoto are required" });
     }
-
     const Model = accountType === 'traveller' ? Traveler : Host;
     const user = await Model.findOne({ email });
-
     if (!user) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
+      return res.status(404).json({ status: "fail", message: "User not found" });
     }
-
     if (user.profilePhoto && mongoose.Types.ObjectId.isValid(user.profilePhoto)) {
-      const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-        bucketName: 'images'
-      });
+      const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'images' });
       try {
         await bucket.delete(new mongoose.Types.ObjectId(user.profilePhoto));
         console.log(`Deleted old profile photo ID: ${user.profilePhoto}`);
@@ -428,28 +427,12 @@ app.patch('/api/update-profile-photo', async (req, res) => {
         console.warn('Failed to delete old profile photo:', err.message);
       }
     }
-
     user.profilePhoto = profilePhoto;
     await user.save();
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        user: {
-          name: user.name,
-          email: user.email,
-          accountType: user.accountType,
-          profilePhoto: user.profilePhoto ? `/api/images/${user.profilePhoto}` : null,
-        },
-      },
-    });
+    res.status(200).json({ status: "success", data: { user: { name: user.name, email: user.email, accountType: user.accountType, profilePhoto: user.profilePhoto ? `/api/images/${user.profilePhoto}` : null } } });
   } catch (error) {
     console.error('Error updating profile photo:', error.message);
-    res.status(500).json({
-      status: "error",
-      message: "Failed to update profile photo",
-      error: error.message,
-    });
+    res.status(500).json({ status: "error", message: "Failed to update profile photo", error: error.message });
   }
 });
 
@@ -483,7 +466,26 @@ app.delete('/api/listings/:id', hostController.deleteListing);
 app.get('/api/rooms', async (req, res) => {
   try {
     const rooms = await Room.find({ status: 'Approved' }).lean();
-    res.json({ status: 'success', data: rooms.map(room => ({ ...room, images: room.images || [], hostImage: room.hostImage && ObjectId.isValid(room.hostImage) ? `/api/images/${room.hostImage}` : room.hostImage || '/images/sai.png' })) });
+    const validateImageUrl = async (image) => {
+      if (!image) return null;
+      if (ObjectId.isValid(image.$oid || image)) {
+        const imageId = image.$oid || image;
+        const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+        return exists.length > 0 ? `/api/images/${imageId}` : null;
+      } else if (image.startsWith('public/uploads/')) {
+        const filePath = path.join(__dirname, image);
+        return fs.existsSync(filePath) ? `/public/${image}` : null;
+      }
+      return null;
+    };
+
+    const cleanedRooms = await Promise.all(rooms.map(async room => ({
+      ...room,
+      images: (await Promise.all((room.images || []).map(validateImageUrl))).filter(url => url) || ['/images/placeholder.png'],
+      hostImage: room.hostImage && ObjectId.isValid(room.hostImage) ? `/api/images/${room.hostImage}` : room.hostImage || '/images/sai.png'
+    })));
+
+    res.json({ status: 'success', data: cleanedRooms });
   } catch (error) {
     console.error('Error fetching rooms:', error.message);
     res.status(500).json({ status: 'error', message: 'Failed to fetch rooms' });
@@ -494,21 +496,58 @@ app.get('/api/health', (req, res) => {
   const imageChecks = {
     defaultProperty: fs.existsSync(path.join(__dirname, 'public/images/photo1.png')),
     logo: fs.existsSync(path.join(__dirname, 'public/images/logo.png')),
-    defaultUser: fs.existsSync(path.join(__dirname, 'public/images/sai.png'))
+    defaultUser: fs.existsSync(path.join(__dirname, 'public/images/sai.png')),
+    placeholder: fs.existsSync(path.join(__dirname, 'public/images/placeholder.png'))
   };
   res.json({ status: 'healthy', images: imageChecks, database: { main: mongoose.connection.readyState === 1, traveler: travelerConnection.readyState === 1 } });
 });
 
-app.get('/api/host-requests', (req, res) => {
-  const rooms = req.roomData.allRooms.map(room => ({
-    _id: room._id?.toString(), name: room.name || 'Unknown', email: room.email || 'No email', title: room.title || 'No title', description: room.description || 'No description',
-    price: room.price?.toString() || 'N/A', location: room.locationName || room.location || 'N/A', coordinates: JSON.stringify(room.coordinates) || 'N/A', propertyType: room.propertyType || 'N/A',
-    capacity: room.capacity?.toString() || 'N/A', roomType: room.roomType || 'N/A', bedrooms: room.bedrooms?.toString() || 'N/A', beds: room.beds?.toString() || 'N/A',
-    roomSize: room.roomSize || 'N/A', roomLocation: room.roomLocation || 'N/A', transportDistance: room.transportDistance || 'N/A', hostGender: room.hostGender || 'N/A',
-    foodFacility: room.foodFacility || 'N/A', amenities: room.amenities?.join(', ') || 'N/A', discount: room.discount?.toString() || 'N/A', maxdays: (room.maxdays || room.maxDays)?.toString() || 'N/A',
-    images: room.images || [], createdAt: room.createdAt || 'N/A', status: room.status || 'pending'
-  }));
-  res.json({ data: rooms });
+app.get('/api/host-requests', async (req, res) => {
+  try {
+    const validateImageUrl = async (image) => {
+      if (!image) return null;
+      if (ObjectId.isValid(image.$oid || image)) {
+        const imageId = image.$oid || image;
+        const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+        return exists.length > 0 ? `/api/images/${imageId}` : null;
+      } else if (image.startsWith('public/uploads/')) {
+        const filePath = path.join(__dirname, image);
+        return fs.existsSync(filePath) ? `/public/${image}` : null;
+      }
+      return null;
+    };
+
+    const rooms = req.roomData.allRooms.map(room => ({
+      _id: room._id?.toString(),
+      name: room.name || 'Unknown',
+      email: room.email || 'No email',
+      title: room.title || 'No title',
+      description: room.description || 'No description',
+      price: room.price?.toString() || 'N/A',
+      location: room.locationName || room.location || 'N/A',
+      coordinates: JSON.stringify(room.coordinates) || 'N/A',
+      propertyType: room.propertyType || 'N/A',
+      capacity: room.capacity?.toString() || 'N/A',
+      roomType: room.roomType || 'N/A',
+      bedrooms: room.bedrooms?.toString() || 'N/A',
+      beds: room.beds?.toString() || 'N/A',
+      roomSize: room.roomSize || 'N/A',
+      roomLocation: room.roomLocation || 'N/A',
+      transportDistance: room.transportDistance || 'N/A',
+      hostGender: room.hostGender || 'N/A',
+      foodFacility: room.foodFacility || 'N/A',
+      amenities: room.amenities?.join(', ') || 'N/A',
+      discount: room.discount?.toString() || 'N/A',
+      maxdays: (room.maxdays || room.maxDays)?.toString() || 'N/A',
+      images: room.images || ['/images/placeholder.png'],
+      createdAt: room.createdAt || 'N/A',
+      status: room.status || 'pending'
+    }));
+    res.json({ data: rooms });
+  } catch (error) {
+    console.error('Error fetching host requests:', error.message);
+    res.status(500).json({ error: 'Failed to fetch host requests' });
+  }
 });
 
 app.get('/api/new-customers', async (req, res) => {
@@ -533,30 +572,53 @@ app.get('/api/recent-activities', async (req, res) => {
 
 app.get('/api/host-requests/images', async (req, res) => {
   try {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ error: 'Missing required field: email' });
-    const rooms = await hostAdminConnection.collection('RoomData').find({ email: email.trim().toLowerCase() }, { projection: { images: 1 } }).toArray();
-    const imageUrls = rooms[0]?.images?.map(image => ObjectId.isValid(image.$oid || image) ? `/api/images/${image.$oid || image}` : image.startsWith('public/uploads/') ? `/public/${image}` : null).filter(url => url) || [];
-    if (!imageUrls.length) return res.status(404).json({ error: 'No images found for this email' });
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: 'Missing required field: id' });
+    const room = await hostAdminConnection.collection('RoomData').findOne({ _id: new ObjectId(id) }, { projection: { images: 1 } });
+    if (!room) return res.status(404).json({ error: 'Room not found' });
+    
+    const validateImageUrl = async (image) => {
+      if (!image) return null;
+      if (ObjectId.isValid(image.$oid || image)) {
+        const imageId = image.$oid || image;
+        const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+        return exists.length > 0 ? `/api/images/${imageId}` : null;
+      } else if (image.startsWith('public/uploads/')) {
+        const filePath = path.join(__dirname, image);
+        return fs.existsSync(filePath) ? `/public/${image}` : null;
+      }
+      return null;
+    };
+
+    const imageUrls = (await Promise.all((room.images || []).map(validateImageUrl))).filter(url => url) || ['/images/placeholder.png'];
+    if (!imageUrls.length) {
+      console.warn(`No valid images found for room ID ${id}`);
+      return res.json({ images: ['/images/placeholder.png'] });
+    }
     res.json({ images: imageUrls });
   } catch (error) {
-    console.error('Image fetch error:', error.message);
+    console.error(`Error fetching images for room ID ${req.query.id}:`, error.message);
     res.status(500).json({ error: 'Failed to fetch images' });
   }
 });
 
 app.get('/api/images/:id', async (req, res) => {
   try {
-    // Example for GridFS
     const imageId = new ObjectId(req.params.id);
     const image = await gfsBucket.find({ _id: imageId }).toArray();
     if (!image || image.length === 0) {
+      console.warn(`Image not found for ID: ${req.params.id}`);
       return res.status(404).send('Image not found');
     }
+    res.set('Content-Type', image[0].contentType);
     const readStream = gfsBucket.openDownloadStream(imageId);
+    readStream.on('error', (error) => {
+      console.error(`Error streaming image ID ${req.params.id}:`, error.message);
+      res.status(500).send('Server error');
+    });
     readStream.pipe(res);
   } catch (error) {
-    console.error('Image fetch error:', error);
+    console.error(`Error fetching image ID ${req.params.id}:`, error.message);
     res.status(500).send('Server error');
   }
 });
@@ -574,14 +636,98 @@ app.post('/api/host-requests/:id/status', async (req, res) => {
     const RoomDataTraveler = travelerConnection.collection('RoomDataTraveler');
     const room = await RoomData.findOne({ _id: new ObjectId(id) });
     if (!room) return res.status(404).json({ error: 'No document found' });
-    const result = await RoomData.updateOne({ _id: new ObjectId(id) }, { $set: { status, updatedAt: new Date() } });
-    if (result.matchedCount === 0 || result.modifiedCount === 0) return res.status(400).json({ error: 'No changes made' });
-    if (status === 'Approved') {
-      await RoomDataTraveler.insertOne({ ...room, status: 'Approved', transferredAt: new Date() });
-    } else if (status === 'Rejected' && room.status === 'Approved') {
-      await RoomDataTraveler.deleteOne({ email: room.email?.trim().toLowerCase() });
+
+    // Update status in RoomData
+    const result = await RoomData.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status, updatedAt: new Date() } }
+    );
+    if (result.matchedCount === 0 || result.modifiedCount === 0) {
+      return res.status(400).json({ error: 'No changes made' });
     }
-    res.json({ message: 'Status updated', status });
+
+    // Validate image URLs
+    const validateImageUrl = async (image) => {
+      if (!image) return null;
+      if (ObjectId.isValid(image.$oid || image)) {
+        const imageId = image.$oid || image;
+        const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+        return exists.length > 0 ? imageId : null;
+      } else if (image.startsWith('public/uploads/')) {
+        const filePath = path.join(__dirname, image);
+        return fs.existsSync(filePath) ? image : null;
+      }
+      return null;
+    };
+    const cleanedImages = (await Promise.all((room.images || []).map(validateImageUrl))).filter(img => img);
+
+    if (status === 'Approved') {
+      // Use upsert to update or insert into RoomDataTraveler, matching by _id
+      await RoomDataTraveler.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            ...room,
+            images: cleanedImages.length > 0 ? cleanedImages : ['/images/placeholder.png'],
+            status: 'Approved',
+            transferredAt: new Date(),
+          },
+        },
+        { upsert: true }
+      );
+    } else if (status === 'Rejected') {
+      // Delete from RoomDataTraveler regardless of previous status
+      await RoomDataTraveler.deleteOne({ _id: new ObjectId(id) });
+    }
+
+    // Fetch updated rooms for response
+    const updatedRooms = await RoomData.find({}, { projection: { likes: 0, booking: 0, reviews: 0, contact: 0, hostId: 0 } }).limit(10).toArray();
+    const cleanedUpdatedRooms = await Promise.all(updatedRooms.map(async (room) => ({
+      ...room,
+      images: (await Promise.all((room.images || []).map(async (image) => {
+        if (!image) return null;
+        if (ObjectId.isValid(image.$oid || image)) {
+          const imageId = image.$oid || image;
+          const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+          return exists.length > 0 ? `/api/images/${imageId}` : null;
+        } else if (image.startsWith('public/uploads/')) {
+          const filePath = path.join(__dirname, image);
+          return fs.existsSync(filePath) ? `/public/${image}` : null;
+        }
+        return null;
+      }))).filter(url => url) || ['/images/placeholder.png'],
+    })));
+
+    res.json({
+      message: 'Status updated',
+      status,
+      rooms: cleanedUpdatedRooms.map((room) => ({
+        _id: room._id?.toString(),
+        name: room.name || 'Unknown',
+        email: room.email || 'No email',
+        title: room.title || 'No title',
+        description: room.description || 'No description',
+        price: room.price?.toString() || 'N/A',
+        location: room.locationName || room.location || 'N/A',
+        coordinates: JSON.stringify(room.coordinates) || 'N/A',
+        propertyType: room.propertyType || 'N/A',
+        capacity: room.capacity?.toString() || 'N/A',
+        roomType: room.roomType || 'N/A',
+        bedrooms: room.bedrooms?.toString() || 'N/A',
+        beds: room.beds?.toString() || 'N/A',
+        roomSize: room.roomSize || 'N/A',
+        roomLocation: room.roomLocation || 'N/A',
+        transportDistance: room.transportDistance || 'N/A',
+        hostGender: room.hostGender || 'N/A',
+        foodFacility: room.foodFacility || 'N/A',
+        amenities: room.amenities?.join(', ') || 'N/A',
+        discount: room.discount?.toString() || 'N/A',
+        maxdays: (room.maxdays || room.maxDays)?.toString() || 'N/A',
+        images: room.images || ['/images/placeholder.png'],
+        createdAt: room.createdAt || 'N/A',
+        status: room.status || 'pending',
+      })),
+    });
   } catch (error) {
     console.error('Update Error:', error.message);
     res.status(500).json({ error: 'Failed to update status' });
@@ -592,13 +738,44 @@ app.post('/api/transfer-host-request', async (req, res) => {
   try {
     const hostData = req.body;
     if (!hostData.email || !hostData.name) return res.status(400).json({ error: 'Missing required fields: email and name' });
+    const validateImageUrl = async (image) => {
+      if (!image) return null;
+      if (ObjectId.isValid(image.$oid || image)) {
+        const imageId = image.$oid || image;
+        const exists = await gfsBucket.find({ _id: new ObjectId(imageId) }).toArray();
+        return exists.length > 0 ? imageId : null;
+      } else if (image.startsWith('public/uploads/')) {
+        const filePath = path.join(__dirname, image);
+        return fs.existsSync(filePath) ? image : null;
+      }
+      return null;
+    };
+    const cleanedImages = (await Promise.all((hostData.images || []).map(validateImageUrl))).filter(img => img);
     const travelerHostData = {
-      name: hostData.name, email: hostData.email.trim().toLowerCase(), title: hostData.title, description: hostData.description, price: parseFloat(hostData.price) || 0,
-      location: hostData.location, coordinates: JSON.parse(hostData.coordinates || '{}'), propertyType: hostData.propertyType, capacity: parseInt(hostData.capacity) || 0,
-      roomType: hostData.roomType, bedrooms: parseInt(hostData.bedrooms) || 0, beds: parseInt(hostData.beds) || 0, roomSize: hostData.roomSize, roomLocation: hostData.roomLocation,
-      transportDistance: hostData.transportDistance, hostGender: hostData.hostGender, foodFacility: hostData.foodFacility, amenities: hostData.amenities?.split(', ') || [],
-      discount: parseFloat(hostData.discount) || 0, maxdays: parseInt(hostData.maxdays) || 0, images: hostData.images || [], createdAt: hostData.createdAt ? new Date(hostData.createdAt) : new Date(),
-      status: 'Approved', transferredAt: new Date()
+      name: hostData.name,
+      email: hostData.email.trim().toLowerCase(),
+      title: hostData.title,
+      description: hostData.description,
+      price: parseFloat(hostData.price) || 0,
+      location: hostData.location,
+      coordinates: JSON.parse(hostData.coordinates || '{}'),
+      propertyType: hostData.propertyType,
+      capacity: parseInt(hostData.capacity) || 0,
+      roomType: hostData.roomType,
+      bedrooms: parseInt(hostData.bedrooms) || 0,
+      beds: parseInt(hostData.beds) || 0,
+      roomSize: hostData.roomSize,
+      roomLocation: hostData.roomLocation,
+      transportDistance: hostData.transportDistance,
+      hostGender: hostData.hostGender,
+      foodFacility: hostData.foodFacility,
+      amenities: hostData.amenities?.split(', ') || [],
+      discount: parseFloat(hostData.discount) || 0,
+      maxdays: parseInt(hostData.maxdays) || 0,
+      images: cleanedImages.length > 0 ? cleanedImages : ['/images/placeholder.png'],
+      createdAt: hostData.createdAt ? new Date(hostData.createdAt) : new Date(),
+      status: 'Approved',
+      transferredAt: new Date()
     };
     const result = await travelerConnection.collection('RoomDataTraveler').insertOne(travelerHostData);
     res.json({ message: 'Host request transferred successfully', id: result.insertedId });
@@ -610,9 +787,9 @@ app.post('/api/transfer-host-request', async (req, res) => {
 
 app.delete('/api/remove-host-request', async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: 'Missing required field: email' });
-    const result = await travelerConnection.collection('RoomDataTraveler').deleteOne({ email: email.trim().toLowerCase() });
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'Missing required field: id' });
+    const result = await travelerConnection.collection('RoomDataTraveler').deleteOne({ _id: new ObjectId(id) });
     if (result.deletedCount === 0) return res.status(404).json({ message: 'No document found to delete' });
     res.json({ message: 'Host request removed successfully' });
   } catch (error) {
@@ -633,17 +810,13 @@ app.post('/loginweb', upload.single('profilePhoto'), async (req, res, next) => {
     } else if (req.body.type === 'signUp') {
       await signUp(req, res);
     } else {
-      res.status(400).json({
-        status: "fail",
-        message: "Please specify request type (signIn, signUp)"
-      });
+      res.status(400).json({ status: "fail", message: "Please specify request type (signIn, signUp)" });
     }
   } catch (err) {
     if (req.file) fs.unlinkSync(req.file.path);
     next(err);
   }
 });
-
 
 // Error Handling
 app.use((err, req, res, next) => {

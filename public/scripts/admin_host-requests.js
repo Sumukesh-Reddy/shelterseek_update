@@ -5,8 +5,23 @@ function sanitizeString(str) {
     return div.innerHTML;
 }
 
+function refreshHostRequests() {
+    console.log('Fetching host requests from /api/host-requests');
+    fetch('/api/host-requests')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            window.hostRequests = data.data || [];
+            console.log('Host requests fetched:', window.hostRequests);
+            populateHostRequests();
+        })
+        .catch(error => console.error('Error refreshing host requests:', error.message));
+}
+
 function populateHostRequests(filteredRequests = window.hostRequests) {
-    console.log('Populating host requests with:', filteredRequests); // Added for debugging
+    console.log('Populating host requests with:', filteredRequests);
     const hostRequestsList = document.querySelector(".host-requests-list");
     if (!hostRequestsList) {
         console.error('Host requests list element not found');
@@ -32,18 +47,27 @@ function populateHostRequests(filteredRequests = window.hostRequests) {
         hostRequestCard.classList.add("host-request-card");
         hostRequestCard.dataset.id = request._id;
 
-        console.log('Rendering request:', request); // Added for debugging
-        if (request.imageUrls && request.imageUrls.length > 0) {
-            console.log(`Adding image for request ${request._id}:`, request.imageUrls[0]); // Added for debugging
-            const image = document.createElement("img");
-            image.src = request.imageUrls[0];
+        console.log(`Rendering request ${request._id}:`, { title: request.title, images: request.images });
+        const image = document.createElement("img");
+        if (request.images && request.images.length > 0 && request.images[0] !== '/images/placeholder.png') {
+            console.log(`Using image for request ${request._id}: ${request.images[0]}`);
+            image.src = request.images[0];
             image.alt = sanitizeString(request.title) || 'Host Request';
             image.loading = "lazy";
-            image.onerror = () => console.error(`Failed to load image for request ${request._id}: ${image.src}`); // Added for debugging
-            hostRequestCard.appendChild(image);
+            image.dataset.imageId = `${request._id}-${index}`;
+            image.onerror = () => {
+                console.error(`Failed to load image for request ${request._id}: ${image.src}`);
+                image.src = '/images/placeholder.png';
+                image.alt = 'Placeholder Image';
+            };
         } else {
-            console.log(`No images for request ${request._id}`); // Added for debugging
+            console.log(`No valid images for request ${request._id}, using placeholder`);
+            image.src = '/images/placeholder.png';
+            image.alt = 'No Image Available';
+            image.loading = "lazy";
+            image.dataset.imageId = `${request._id}-placeholder`;
         }
+        hostRequestCard.appendChild(image);
 
         const title = document.createElement("h3");
         title.textContent = sanitizeString(request.title) || 'No title';
@@ -84,7 +108,7 @@ function openModal(id) {
     }
     const request = window.hostRequests[requestIndex];
 
-    console.log('Opening modal for request:', request); // Added for debugging
+    console.log('Opening modal for request:', request);
 
     document.getElementById("modal-host-name").textContent = sanitizeString(request.title) || 'No title';
     document.getElementById("modal-host-name-text").textContent = sanitizeString(request.name) || 'Unknown';
@@ -113,18 +137,29 @@ function openModal(id) {
         modalMedia.innerHTML = "";
         const imageCarousel = document.createElement("div");
         imageCarousel.classList.add("image-carousel");
-        if (request.imageUrls && request.imageUrls.length > 0) {
-            console.log(`Adding images to modal for request ${request._id}:`, request.imageUrls); // Added for debugging
-            request.imageUrls.forEach((imageSrc, i) => {
+        if (request.images && request.images.length > 0 && request.images[0] !== '/images/placeholder.png') {
+            console.log(`Adding images to modal for request ${request._id}:`, request.images);
+            request.images.forEach((imageSrc, i) => {
                 const img = document.createElement("img");
                 img.src = imageSrc;
                 img.alt = `Image ${i + 1} of ${sanitizeString(request.title) || 'Host Request'}`;
                 img.loading = "lazy";
-                img.onerror = () => console.error(`Failed to load modal image for request ${request._id}: ${imageSrc}`); // Added for debugging
+                img.dataset.imageId = `${request._id}-${i}`;
+                img.onerror = () => {
+                    console.error(`Failed to load modal image for request ${request._id}: ${imageSrc}`);
+                    img.src = '/images/placeholder.png';
+                    img.alt = 'Placeholder Image';
+                };
                 imageCarousel.appendChild(img);
             });
         } else {
-            console.log(`No images for modal of request ${request._id}`); // Added for debugging
+            console.log(`No valid images for modal of request ${request._id}, using placeholder`);
+            const placeholder = document.createElement("img");
+            placeholder.src = '/images/placeholder.png';
+            placeholder.alt = 'No Image Available';
+            placeholder.loading = "lazy";
+            placeholder.dataset.imageId = `${request._id}-placeholder`;
+            imageCarousel.appendChild(placeholder);
         }
         modalMedia.appendChild(imageCarousel);
     }
@@ -143,27 +178,39 @@ function openModal(id) {
 }
 
 function updateHostStatus(id, status) {
+    console.log(`Updating status for request ${id} to ${status}`);
+    const acceptBtn = document.querySelector(".modal-actions .accept");
+    const rejectBtn = document.querySelector(".modal-actions .reject");
+
+    // Disable buttons to prevent multiple clicks
+    acceptBtn.disabled = true;
+    rejectBtn.disabled = true;
+
     fetch(`/api/host-requests/${id}/status`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+    })
     .then(data => {
         if (data.message === 'Status updated') {
-            const requestIndex = window.hostRequests.findIndex(req => req._id === id);
-            if (requestIndex !== -1) {
-                window.hostRequests[requestIndex].status = status;
-                populateHostRequests();
-                closeModal();
-            }
+            console.log('Status updated successfully, refreshing host requests');
+            window.hostRequests = data.rooms || [];
+            populateHostRequests();
+            closeModal();
         } else {
             console.error('Failed to update status:', data);
         }
     })
-    .catch(error => console.error('Error updating status:', error));
+    .catch(error => console.error('Error updating status:', error.message))
+    .finally(() => {
+        // Re-enable buttons
+        acceptBtn.disabled = false;
+        rejectBtn.disabled = false;
+    });
 }
 
 function closeModal() {
@@ -200,10 +247,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    const closeModalBtn = document.querySelector(".modal .close-modal"); // Fixed selector to match class
+    const closeModalBtn = document.querySelector(".modal .close-modal");
     if (closeModalBtn) {
         closeModalBtn.addEventListener("click", closeModal);
     }
 
-    populateHostRequests();
+    refreshHostRequests();
 });
